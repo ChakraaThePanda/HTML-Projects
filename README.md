@@ -1,4 +1,4 @@
-# Chakraa's HTML Projects
+# HTML-Projects
 
 Small games and tools that run right in your browser, each self-contained in its own subfolder.
 
