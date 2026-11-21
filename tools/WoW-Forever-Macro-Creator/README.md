@@ -8,5 +8,7 @@ Build WoW Forever macros without memorizing the syntax.
 - Start the macro with `#showtooltip` (automatic, a specific spell, or following each spell's conditions) or `#show`, and add common extra lines like `/stopcasting`, `/dismount` or `/startattack`.
 - Live preview with a 255 character counter. Anything past the limit is struck through so you can see what the game would cut off.
 - Plain English summary of what each spell line does, plus warnings for spells that can never be reached.
+- Paste any macro, from the game or one you found online, to rebuild it on the page so you can edit it.
+- Put a spell on its own line so it runs too, handy for spells that don't trigger the global cooldown.
 - Save your macros in the browser. They are grouped by class with their spell icons, and you can put them in your own order.
 - Works on phones too, with the character count and copy button kept at the bottom of the screen.

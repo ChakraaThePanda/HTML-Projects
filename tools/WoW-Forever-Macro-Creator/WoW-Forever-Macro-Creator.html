@@ -254,7 +254,9 @@
   .row-pair .row-sub:last-child { grid-template-columns: 60px minmax(0,1fr); }
   .row-sub select { max-width: 260px; }
   @media (max-width: 700px) { .row-pair { grid-template-columns: 1fr; } .row-pair .row-sub:last-child { grid-template-columns: 70px minmax(0,1fr); } }
-  .row-note { font-size: 13.5px; color: var(--mute); border-top: 1px solid var(--steel-dk); padding-top: 8px; }
+  .row-foot { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 14px; border-top: 1px solid var(--steel-dk); padding-top: 8px; }
+  .row-note { font-size: 13.5px; color: var(--mute); flex: 1 1 260px; }
+  .own-line { font-size: 12.5px; color: var(--mute); white-space: nowrap; }
   .row-note b { color: var(--q2); font-weight: 700; }
   .row-note.bad { color: #ff6a6a; }
   /* phones: number, command and tools on one line, the name below */
@@ -340,6 +342,16 @@
   .saved .meta { color: var(--mute); font-size: 12px; font-weight: 400; flex: none; }
   .saved .btn.confirm { border-color: var(--red); color: var(--red); }
   .saved-empty { color: var(--mute); font-size: 13.5px; font-style: italic; margin: 0; }
+  .card h2 .btn.small { font-family: var(--f-ui); font-size: 12.5px; font-weight: 600; letter-spacing: 0; text-shadow: none; padding: 3px 10px; }
+  .import { display: grid; gap: 8px; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--steel-dk); }
+  .import textarea {
+    width: 100%; resize: vertical; min-height: 110px; background: #000; color: var(--ink); border: 1px solid #000;
+    box-shadow: 0 0 0 1px #3b4060; border-radius: 3px; padding: 8px 10px; font: 13px/1.5 var(--f-mono);
+  }
+  .import textarea:focus { outline: none; box-shadow: 0 0 0 1px var(--gold-dk), 0 0 10px rgba(255, 209, 0, .15); }
+  .import-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  #importResult { margin: 0; }
+  #importResult:empty { display: none; }
 
   /* raid-warning style message */
   .toast {
@@ -434,7 +446,16 @@
       </section>
 
       <section class="card" id="savedCard">
-        <h2>Saved macros <span class="hint">click one to load it</span></h2>
+        <h2>Saved macros <button class="btn small" id="importOpen" type="button">Import</button></h2>
+        <div class="import" id="importBox" hidden>
+          <textarea id="importText" rows="6" spellcheck="false" placeholder="Paste a macro here, from the game or from a website"></textarea>
+          <input type="text" id="importName" maxlength="16" placeholder="Name for a pasted macro (optional)" />
+          <div class="import-actions">
+            <button class="wbtn" id="importGo" type="button">Import</button>
+            <button class="btn" id="importCancel" type="button">Cancel</button>
+          </div>
+          <ul class="notes" id="importResult"></ul>
+        </div>
         <ul class="saved" id="saved"></ul>
       </section>
     </aside>
@@ -578,7 +599,7 @@
   };
 
   let uid = 0;
-  const newRow = () => ({ id: ++uid, cmd: '/cast', spell: '', mods: [], nomod: false, target: '', stances: [], conds: [], rank: '' });
+  const newRow = () => ({ id: ++uid, cmd: '/cast', spell: '', mods: [], nomod: false, target: '', stances: [], conds: [], rank: '', ownLine: false });
   const freshState = () => ({
     name: '', cls: '', tooltip: 'auto', tooltipSpell: '', compact: false, extras: [],
     rows: [newRow()],
@@ -617,6 +638,7 @@
         stances: Array.isArray(r.stances) ? list(r.stances) : str(r.stance) ? r.stance.split('/') : [],
         conds: list(r.conds),
         rank: str(r.rank),
+        ownLine: r.ownLine === true,
       })) : base.rows,
     };
   }
@@ -657,13 +679,14 @@
     let tooltipDone = false; // the first line already has a clause with no conditions
     for (const r of state.rows) {
       if (!r.spell.trim()) continue;
-      if (!current || current.cmd !== r.cmd) {
+      const lineStart = !!current && (current.cmd !== r.cmd || r.ownLine);
+      if (!current || lineStart) {
         current = { cmd: r.cmd, clauses: [] };
         lines.push(current);
         caughtAll = false;
       }
       const conds = rowConditions(r);
-      rowInfo.set(r.id, { dead: caughtAll, fallback: conds.length === 0 });
+      rowInfo.set(r.id, { dead: caughtAll, fallback: conds.length === 0, lineStart, first: !current.clauses.length });
       const clause = (conds.length ? '[' + conds.join(',') + ']' + sp : '') + spellText(r);
       current.clauses.push(clause);
       if (tooltip && !caughtAll && !tooltipDone && !tooltip.clauses.includes(clause)) tooltip.clauses.push(clause);
@@ -740,9 +763,18 @@
     if (!d) return el('div', { class: 'row-note' }, 'Type a name to add this to the macro.');
     if (info.dead) return el('div', { class: 'row-note bad' },
       'This never happens: a spell above it on the same line has no conditions, so it always wins first.');
-    return el('div', { class: 'row-note' },
-      d.when.length ? 'When ' + listJoin(d.when) + ': ' : (state.rows.length > 1 ? 'Otherwise: ' : ''),
-      d.verb.toLowerCase() + ' ', el('b', {}, d.spell), d.on + '.');
+    const when = d.when.length ? 'when ' + listJoin(d.when) + ': ' : '';
+    const lead = info.lineStart ? 'Also, ' + (when || '') : when ? when[0].toUpperCase() + when.slice(1) : info.first ? '' : 'Otherwise: ';
+    return el('div', { class: 'row-note' }, lead, (lead ? d.verb.toLowerCase() : d.verb) + ' ', el('b', {}, d.spell), d.on + '.');
+  }
+
+  // "On its own line" only matters when the row above uses the same command.
+  function ownLineToggle(r, i) {
+    const prev = state.rows[i - 1];
+    if (!prev || prev.cmd !== r.cmd) return null;
+    return el('label', { class: 'switch own-line', title: 'Put this spell on its own line so it runs too, instead of only when the spells above it don\'t. Useful for spells that don\'t trigger the global cooldown.' },
+      focusKey(el('input', { type: 'checkbox', checked: r.ownLine, on: { change: e => { r.ownLine = e.target.checked; refresh(); } } }), r, 'own-line'),
+      'On its own line');
   }
 
   // The spell icon and rank picker that sit around a spell box.
@@ -864,7 +896,7 @@
         stanceLine
           ? el('div', { class: 'row-pair' }, stanceLine, el('div', { class: 'row-sub' }, el('span', {}, 'Only if'), el('div', { class: 'chips' }, condChips)))
           : el('div', { class: 'row-sub' }, el('span', {}, 'Only if'), el('div', { class: 'chips' }, condChips)),
-        rowNote(r, info),
+        el('div', { class: 'row-foot' }, rowNote(r, info), ownLineToggle(r, i)),
       );
       rowEl.dataset.row = r.id;
       return rowEl;
@@ -945,12 +977,97 @@
     $('notes').replaceChildren(...notes.map(([cls, msg]) => el('li', { class: cls }, msg)));
   }
 
+  /* ---------- pasting a macro in ---------- */
+
+  // Run fn with another macro loaded as the current one (used to measure the compact version).
+  function withState(other, fn) {
+    const prev = state;
+    state = other;
+    try { return fn(); } finally { state = prev; }
+  }
+
+  // Turn macro text back into editable rows. Returns the macro and a list of what couldn't be brought over.
+  function parseMacro(text) {
+    const st = freshState();
+    st.tooltip = 'off';
+    st.rows = [];
+    const skipped = [];
+    const stanceCodes = [];
+    for (const raw of text.replace(/\r/g, '').split('\n')) {
+      const line = raw.trim();
+      if (!line) continue;
+      const low = line.toLowerCase();
+      if (low === '#showtooltip') { st.tooltip = 'auto'; continue; }
+      if (low.startsWith('#showtooltip ')) {
+        const rest = line.slice(13).trim();
+        if (/[\[;]/.test(rest)) st.tooltip = 'match';
+        else { st.tooltip = 'spell'; st.tooltipSpell = rest; }
+        continue;
+      }
+      if (low === '#show' || low.startsWith('#show ')) { st.tooltip = 'show'; continue; }
+      const extra = EXTRAS.find(e => e.line.toLowerCase() === low.replace(/^\/script /, '/run '));
+      if (extra) { if (!st.extras.includes(extra.id)) st.extras.push(extra.id); continue; }
+      const cmd = line.match(/^\/(cast|use)\s+(.*)$/i);
+      if (!cmd) { skipped.push(line); continue; }
+      let firstOnLine = true;
+      for (const part of cmd[2].split(';')) {
+        const clause = part.trim();
+        if (!clause) continue;
+        const m = clause.match(/^((?:\[[^\]]*\]\s*)*)(.*)$/);
+        const groups = [...m[1].matchAll(/\[([^\]]*)\]/g)].map(g => g[1].trim());
+        let spell = m[2].trim();
+        if (!spell) continue;
+        let rank = '';
+        const ranked = spell.match(/^(.*?)\s*\(\s*rank\s*(\d+)\s*\)$/i);
+        if (ranked) { spell = ranked[1].trim(); rank = ranked[2]; }
+        // "[a][b] Spell" means a OR b, which is the same as "[a] Spell; [b] Spell": one row per group
+        for (const group of groups.length ? groups : ['']) {
+          const row = { ...newRow(), cmd: '/' + cmd[1].toLowerCase(), spell, rank, ownLine: firstOnLine && st.rows.length > 0 };
+          firstOnLine = false;
+          for (const c of group.split(',').map(x => x.trim()).filter(Boolean)) {
+            const lc = c.toLowerCase().replace(/^(no)?modifier/, '$1mod').replace(/^target=/, '@');
+            const mod = lc.match(/^mod:(shift|ctrl|alt)$/);
+            const stance = lc.match(/^(?:stance|form):([0-9/]+)$/);
+            if (lc.startsWith('@') && TARGETS.some(t => t.v === lc)) row.target = lc;
+            else if (mod) { if (!row.mods.includes(mod[1])) row.mods.push(mod[1]); }
+            else if (lc === 'nomod') row.nomod = true;
+            else if (stance || lc === 'nostance') {
+              row.stances = stance ? stance[1].split('/').filter(Boolean) : ['0'];
+              stanceCodes.push(...row.stances);
+            }
+            else if (CONDS.some(k => k.v === lc)) row.conds.push(lc);
+            else skipped.push(`[${c}] on ${spell} (left out)`);
+          }
+          if (row.nomod) row.mods = [];
+          st.rows.push(row);
+        }
+      }
+    }
+    // the class whose spell list matches the most names
+    const votes = {};
+    for (const r of st.rows) for (const x of ALL_SPELLS)
+      if (x.name.toLowerCase() === r.spell.toLowerCase()) votes[x.cls] = (votes[x.cls] || 0) + 1;
+    const best = Object.entries(votes).sort((a, b) => b[1] - a[1]);
+    if (best.length && (best.length === 1 || best[0][1] > best[1][1])) st.cls = best[0][0];
+    if (stanceCodes.length && !stancesFor(st.cls).length) skipped.push('stance conditions (could not tell which class this is for)');
+    if (!st.rows.length) st.rows = [newRow()];
+    return { state: normalize(st), skipped };
+  }
+
+  // A pasted macro (say, one found online) opens in the editor; press Save to keep it.
+  function runImport(text, name) {
+    const { state: st, skipped } = parseMacro(text);
+    st.name = (name || '').trim();
+    state = st;
+    renderAll();
+    const out = [['tip', 'Macro loaded below for you to edit. Press Save to keep it.']];
+    if (skipped.length) out.push(['warn', `Couldn't bring over ${skipped.join(', ')}.`]);
+    $('importResult').replaceChildren(...out.map(([cls, msg]) => el('li', { class: cls }, msg)));
+    toast('Macro loaded');
+  }
+
   function buildCompactPreview() {
-    const prev = state.compact;
-    state.compact = true;
-    const { text } = build();
-    state.compact = prev;
-    return text;
+    return withState({ ...state, compact: true }, () => build().text);
   }
 
   function renderMeter(text) {
@@ -1230,6 +1347,25 @@
     store.set(SAVED_KEY, list);
     renderSaved();
     toast(i >= 0 ? 'Updated ' + name : 'Saved ' + name);
+  });
+
+  $('importOpen').addEventListener('click', () => {
+    const box = $('importBox');
+    box.hidden = !box.hidden;
+    if (!box.hidden) $('importText').focus();
+  });
+  $('importCancel').addEventListener('click', () => {
+    $('importBox').hidden = true;
+    $('importText').value = '';
+    $('importName').value = '';
+    $('importResult').replaceChildren();
+  });
+  $('importGo').addEventListener('click', () => {
+    const text = $('importText').value;
+    if (!text.trim()) { $('importText').focus(); return toast('Paste a macro first'); }
+    runImport(text, $('importName').value);
+    $('importText').value = '';
+    $('importName').value = '';
   });
 
   $('reset').addEventListener('click', () => {
