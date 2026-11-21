@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>WoW Forever Macro Creator</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+  /* Cinzel and Nunito Sans with the space above and below the letters evened out (same fix as SkillUp),
+     so text sits in the middle of buttons, tags and bars instead of slightly high. */
+  @font-face { font-family: 'Cinzel'; font-style: normal; font-weight: 400 900; font-display: swap; ascent-override: 102.5%; descent-override: 32.5%;
+    src: url(https://fonts.gstatic.com/s/cinzel/v26/8vIJ7ww63mVu7gt79mT7.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+  @font-face { font-family: 'Cinzel'; font-style: normal; font-weight: 400 900; font-display: swap; ascent-override: 102.5%; descent-override: 32.5%;
+    src: url(https://fonts.gstatic.com/s/cinzel/v26/8vIJ7ww63mVu7gt7-GT7LEc.woff2) format('woff2'); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+  @font-face { font-family: 'Nunito Sans'; font-style: normal; font-weight: 200 1000; font-display: swap; ascent-override: 103.5%; descent-override: 32.5%;
+    src: url(https://fonts.gstatic.com/s/nunitosans/v19/pe0AMImSLYBIv1o4X1M8ce2xCx3yop4tQpF_MeTm0lfUVwoNnq4CLz0_kJ3xzA.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+  @font-face { font-family: 'Nunito Sans'; font-style: normal; font-weight: 200 1000; font-display: swap; ascent-override: 103.5%; descent-override: 32.5%;
+    src: url(https://fonts.gstatic.com/s/nunitosans/v19/pe0AMImSLYBIv1o4X1M8ce2xCx3yop4tQpF_MeTm0lfUVwoNnq4CLz0_kJPxzGOF.woff2) format('woff2'); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+  @font-face { font-family: 'Nunito Sans'; font-style: normal; font-weight: 200 1000; font-display: swap; ascent-override: 103.5%; descent-override: 32.5%;
+    src: url(https://fonts.gstatic.com/s/nunitosans/v19/pe0AMImSLYBIv1o4X1M8ce2xCx3yop4tQpF_MeTm0lfUVwoNnq4CLz0_kJDxzGOF.woff2) format('woff2'); unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F; }
+  @font-face { font-family: 'Nunito Sans'; font-style: normal; font-weight: 200 1000; font-display: swap; ascent-override: 103.5%; descent-override: 32.5%;
+    src: url(https://fonts.gstatic.com/s/nunitosans/v19/pe0AMImSLYBIv1o4X1M8ce2xCx3yop4tQpF_MeTm0lfUVwoNnq4CLz0_kJnxzGOF.woff2) format('woff2'); unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116; }
+  @font-face { font-family: 'Nunito Sans'; font-style: normal; font-weight: 200 1000; font-display: swap; ascent-override: 103.5%; descent-override: 32.5%;
+    src: url(https://fonts.gstatic.com/s/nunitosans/v19/pe0AMImSLYBIv1o4X1M8ce2xCx3yop4tQpF_MeTm0lfUVwoNnq4CLz0_kJLxzGOF.woff2) format('woff2'); unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB; }
+  /* Borrows Classic WoW's interface look (same as SkillUp): night-blue tooltip panels with
+     steel borders, gold titles, red-and-gold buttons, the blue Skills-tab bar for the counter. */
+  :root {
+    color-scheme: dark;
+    --night:    #05060d;
+    --panel:    rgba(10, 12, 30, .94);
+    --field:    #0a0d1c;
+    --steel:    #6f7690;
+    --steel-dk: #2a2f48;
+    --ink:      #f4f1ea;
+    --mute:     #a3a9c2;
+    --faint:    #6c7290;
+    --gold:     #ffd100;
+    --gold-dk:  #b38a00;
+    --skill:    #2350c8;
+    --q2: #1eff00; --q3: #0070dd; --q4: #a335ee;
+    --red: #ff2020; --orange: #ff8040; --green: #40c040;
+    --btn: #8f0f0f; --btn-dk: #4a0505;
+    --f-title: 'Cinzel', 'Trajan Pro', Georgia, serif;
+    --f-ui: 'Nunito Sans', 'Segoe UI', system-ui, sans-serif;
+    --f-mono: 'JetBrains Mono', Consolas, monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { background: var(--night); }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+      radial-gradient(1200px 700px at 20% -10%, #1a2350 0%, transparent 60%),
+      radial-gradient(900px 600px at 110% 110%, #2a1238 0%, transparent 55%),
+      var(--night);
+    color: var(--ink);
+    font-family: var(--f-ui);
+    font-size: 15px;
+    line-height: 1.45;
+    padding: 22px 16px 50px;
+  }
+  button, input, select { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+  .wrap { width: min(1180px, 100%); margin: 0 auto; }
+
+  header { text-align: center; margin-bottom: 22px; }
+  header h1 {
+    font-family: var(--f-title);
+    font-weight: 700;
+    font-size: clamp(1.6rem, 3.5vw, 2.3rem);
+    color: var(--gold);
+    margin: 0;
+    letter-spacing: .05em;
+    text-shadow: 0 1px 0 #000, 0 0 14px rgba(255, 209, 0, .22);
+  }
+  header p { margin: 6px 0 0; color: var(--mute); }
+  /* shows logo.png from this folder when it exists */
+  header .logo { display: block; margin: 0 auto 8px; max-height: 96px; max-width: min(340px, 75%); filter: drop-shadow(0 4px 12px rgba(0,0,0,.6)); }
+
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 14px; align-items: start; }
+  .side { position: sticky; top: 14px; display: grid; gap: 14px; }
+  /* narrow screens: one column, spells last since that list keeps growing */
+  @media (max-width: 960px) {
+    .layout { grid-template-columns: minmax(0, 1fr); }
+    main, .side { display: contents; }
+    main .card + .card { margin-top: 0; }
+    #macroCard { order: 1; } #extrasCard { order: 2; } #previewCard { order: 3; } #savedCard { order: 4; } #spellsCard { order: 5; }
+  }
+
+  /* tooltip-style panel */
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--steel);
+    border-radius: 5px;
+    box-shadow: inset 0 0 0 1px #000, 0 0 0 1px #000, 0 10px 30px rgba(0,0,0,.55);
+    padding: 14px;
+  }
+  main .card + .card { margin-top: 14px; } /* the side column already spaces its cards with its grid gap */
+  .card h2 {
+    font-family: var(--f-title);
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: .04em;
+    color: var(--gold);
+    text-shadow: 0 1px 0 #000, 0 0 12px rgba(255, 209, 0, .18);
+    margin: -14px -14px 14px;
+    padding: 11px 14px 9px;
+    border-bottom: 1px solid var(--steel-dk);
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  }
+  .hint { color: var(--mute); font-size: 12.5px; font-weight: 400; font-family: var(--f-ui); letter-spacing: 0; text-shadow: none; }
+
+  label.field { display: grid; gap: 5px; font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--mute); }
+  input[type=text], select {
+    background: var(--field);
+    border: 1px solid #000;
+    box-shadow: 0 0 0 1px #3b4060;
+    border-radius: 3px;
+    padding: 7px 10px;
+    min-width: 0;
+    width: 100%;
+    font-size: 15px;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--ink);
+  }
+  input[type=text]:focus, select:focus { outline: none; box-shadow: 0 0 0 1px var(--gold-dk), 0 0 10px rgba(255, 209, 0, .15); }
+  input::placeholder { color: var(--faint); }
+  select option { background: #0b0e22; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 560px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  /* toggles, styled like SkillUp's recipe tabs; when on they take item quality colors */
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    background: #0b0e22;
+    border: 1px solid var(--steel-dk);
+    color: var(--mute);
+    border-radius: 4px;
+    padding: 3px 10px;
+    font-size: 13.5px;
+    font-weight: 600;
+    user-select: none;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: border-color .12s, color .12s, background .12s;
+  }
+  .chip svg { width: 10px; height: 10px; }
+  .chip:hover { border-color: var(--steel); color: var(--ink); }
+  .chip[aria-pressed=true] { color: var(--gold); border-color: var(--gold-dk); background: #1a1708; }
+  .chip.mod[aria-pressed=true] { color: #c98cff; border-color: var(--q4); background: #1d0f2e; }
+  .chip.cond[aria-pressed=true] { color: #5aa9ff; border-color: var(--q3); background: #08182e; }
+  /* dropdown with checkboxes (stances) */
+  .msel { position: relative; max-width: 260px; }
+  .msel > summary {
+    list-style: none; cursor: pointer; user-select: none;
+    background: var(--field); border: 1px solid #000; box-shadow: 0 0 0 1px #3b4060; border-radius: 3px;
+    padding: 7px 30px 7px 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; position: relative;
+  }
+  .msel > summary::-webkit-details-marker { display: none; }
+  .msel > summary::after { content: ""; position: absolute; right: 11px; top: 50%; width: 6px; height: 6px; margin-top: -5px;
+    border-right: 2px solid var(--mute); border-bottom: 2px solid var(--mute); transform: rotate(45deg); }
+  .msel[open] > summary { box-shadow: 0 0 0 1px var(--gold-dk), 0 0 10px rgba(255, 209, 0, .15); }
+  .msel[open] > summary::after { transform: rotate(225deg); margin-top: -1px; }
+  .msel-panel {
+    position: absolute; z-index: 5; left: 0; right: 0; top: calc(100% + 4px); min-width: 180px;
+    background: #0b0e22; border: 1px solid var(--steel); border-radius: 4px; padding: 4px;
+    box-shadow: inset 0 0 0 1px #000, 0 10px 24px rgba(0,0,0,.6);
+  }
+  .msel-panel label { display: flex; align-items: center; gap: 9px; padding: 6px 8px; border-radius: 3px; cursor: pointer; }
+  .msel-panel label:hover { background: rgba(79, 127, 255, .12); }
+  .msel-panel input { accent-color: var(--gold); width: 16px; height: 16px; margin: 0; }
+  .msel-panel code { margin-left: auto; font-family: var(--f-mono); font-size: 11.5px; color: var(--faint); }
+  .add-cond { width: auto; max-width: 100%; padding: 3px 8px; font-size: 13.5px; font-weight: 600; color: var(--gold); border-radius: 4px; cursor: pointer; }
+  .add-cond option, .add-cond optgroup { color: var(--ink); }
+  .chip code { font-family: var(--f-mono); font-size: 11.5px; font-weight: 400; opacity: .7; }
+
+  /* red-and-gold WoW button */
+  .wbtn {
+    background: linear-gradient(#b31a1a, var(--btn) 45%, var(--btn-dk));
+    color: var(--gold);
+    border: 1px solid #000;
+    box-shadow: inset 0 0 0 1px #d4a52a66, 0 1px 0 #000;
+    border-radius: 4px;
+    padding: 6px 14px 4px; /* 1px lower: the capitals otherwise sit high */
+    font-weight: 700;
+    font-size: 14px;
+    text-shadow: 0 1px 0 #000;
+    white-space: nowrap;
+  }
+  .wbtn:hover { filter: brightness(1.18); }
+  .wbtn.green { background: linear-gradient(#3c7d24, #24561a 50%, #123a0c); color: #e9ffd8; box-shadow: inset 0 0 0 1px #8fe36a66, 0 1px 0 #000; }
+
+  /* small buttons on each spell row */
+  .btn {
+    background: #0b0e22;
+    border: 1px solid var(--steel-dk);
+    border-radius: 4px;
+    padding: 4px 10px;
+    color: var(--mute);
+  }
+  .btn:hover { border-color: var(--steel); color: var(--ink); }
+  .btn.icon { display: inline-grid; place-items: center; padding: 0 8px; min-width: 30px; height: 26px; line-height: 1; }
+  .btn.icon svg { display: block; }
+  .btn:disabled { opacity: .3; cursor: default; border-color: var(--steel-dk); color: var(--mute); }
+  .btn.danger:hover:not(:disabled) { border-color: var(--btn); color: #ff6a6a; }
+
+  /* spell rows */
+  .rows { display: grid; gap: 8px; }
+  .row {
+    border: 1px solid var(--steel-dk);
+    border-left: 3px solid var(--gold-dk);
+    border-radius: 4px;
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, .025);
+    display: grid;
+    gap: 9px;
+  }
+  .row:hover { background: rgba(79, 127, 255, .07); }
+  .row.fallback { border-left-color: var(--green); }
+  .row.dead { border-left-color: var(--red); background: rgba(255, 32, 32, .04); }
+  .row-top { display: grid; grid-template-columns: auto 92px minmax(0,1fr) auto; gap: 8px; align-items: center; }
+  .row-num {
+    font-family: var(--f-title); font-weight: 700; color: var(--gold); text-shadow: 0 1px 0 #000;
+    width: 26px; height: 26px; display: grid; place-items: center;
+    border: 1px solid var(--gold-dk); border-radius: 50%; background: #1a1708; font-size: 13px; padding-top: 2px;
+  }
+  .row-tools { display: flex; gap: 4px; }
+  .spell-wrap { position: relative; display: flex; gap: 6px; min-width: 0; }
+  .spell-wrap input { flex: 1; }
+  .spell-wrap input.has-icon { padding-left: 40px; }
+  .spell-icon { position: absolute; left: 5px; top: 50%; transform: translateY(-50%); width: 26px; height: 26px; border-radius: 3px;
+    box-shadow: 0 0 0 1px #000, 0 0 0 2px #3b4060; pointer-events: none; }
+  .spell-wrap select.rank { width: auto; flex: none; max-width: 46%; font-size: 13.5px; }
+
+  /* spell search list */
+  .suggest {
+    position: absolute; z-index: 20; background: #0b0e22; border: 1px solid var(--steel); border-radius: 4px; padding: 4px;
+    box-shadow: inset 0 0 0 1px #000, 0 12px 28px rgba(0,0,0,.65); max-height: 340px; overflow-y: auto;
+  }
+  .sitem { display: grid; grid-template-columns: 30px minmax(0,1fr) auto; gap: 10px; align-items: center; padding: 5px 8px; border-radius: 3px; cursor: pointer; }
+  .sitem.on, .sitem:hover { background: rgba(79, 127, 255, .16); }
+  .sitem img { width: 30px; height: 30px; border-radius: 3px; box-shadow: 0 0 0 1px #000, 0 0 0 2px #3b4060; }
+  .sitem .sname { font-weight: 700; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sitem.on .sname { color: var(--gold); }
+  .sitem small { color: var(--mute); font-size: 12px; white-space: nowrap; }
+  .row-sub { display: grid; grid-template-columns: 70px minmax(0,1fr); gap: 8px; align-items: center; }
+  .row-sub > span { font-size: 11px; color: var(--mute); text-transform: uppercase; letter-spacing: .14em; }
+  .row-pair { display: grid; grid-template-columns: 330px minmax(0,1fr); gap: 9px 20px; } /* fixed first column so stacked pairs line up */
+  .row-pair .row-sub:last-child { grid-template-columns: 60px minmax(0,1fr); }
+  .row-sub select { max-width: 260px; }
+  @media (max-width: 700px) { .row-pair { grid-template-columns: 1fr; } .row-pair .row-sub:last-child { grid-template-columns: 70px minmax(0,1fr); } }
+  .row-note { font-size: 13.5px; color: var(--mute); border-top: 1px solid var(--steel-dk); padding-top: 8px; }
+  .row-note b { color: var(--q2); font-weight: 700; }
+  .row-note.bad { color: #ff6a6a; }
+  /* phones: number, command and tools on one line, the name below */
+  @media (max-width: 560px) {
+    .row { padding: 10px; }
+    .row-top { grid-template-columns: auto 84px minmax(0,1fr); }
+    .row-top .row-tools { grid-column: 3; grid-row: 1; justify-content: flex-end; }
+    .row-top .spell-wrap { grid-column: 1 / -1; flex-wrap: wrap; }
+    .spell-wrap input { flex-basis: 100%; }
+    .spell-wrap select.rank { flex: 1; max-width: none; }
+    .spell-icon { top: 21px; }
+    .row-sub, .row-pair .row-sub:last-child { grid-template-columns: 58px minmax(0,1fr); }
+    .row-sub > span { letter-spacing: .08em; }
+    .row-sub select, .msel { max-width: none; }
+    .card h2 { flex-wrap: wrap; }
+  }
+  .add-row {
+    margin-top: 10px; width: 100%; padding: 8px;
+    background: none; border: 1px dashed var(--steel); border-radius: 4px;
+    color: var(--gold); font-weight: 700;
+  }
+  .add-row:hover { border-color: var(--gold-dk); background: rgba(255, 209, 0, .05); }
+
+  /* preview, like the in-game macro text box */
+  .preview {
+    background: #000;
+    border: 1px solid #000;
+    box-shadow: 0 0 0 1px #3b4060, inset 0 0 24px rgba(35, 80, 200, .12);
+    border-radius: 3px;
+    padding: 12px 14px;
+    font-family: var(--f-mono);
+    font-size: 13.5px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    min-height: 120px;
+    margin: 0;
+  }
+  .preview .empty { color: var(--faint); font-family: var(--f-ui); font-style: italic; }
+  .tk-dir  { color: var(--orange); }
+  .tk-cmd  { color: var(--gold); }
+  .tk-cond { color: #5aa9ff; }
+  .tk-semi { color: var(--faint); }
+  .tk-name { color: var(--q2); }
+  .tk-over { background: rgba(255, 32, 32, .22); color: #ff9a9a; text-decoration: line-through; text-decoration-color: rgba(255, 32, 32, .7); }
+
+  /* character counter: Skills-tab bar with the text on it */
+  .sbar { position: relative; height: 22px; margin-top: 12px; border: 1px solid #000; border-radius: 3px; background: var(--field); box-shadow: 0 0 0 1px #3b4060; overflow: hidden; }
+  .sbar > i { position: absolute; inset: 0 auto 0 0; width: 0; background: linear-gradient(#5a86ff, var(--skill) 55%, #13307f); transition: width .15s; }
+  .sbar.warn > i { background: linear-gradient(#ffe36b, #d6a400 55%, #8a6a00); }
+  .sbar.over > i { background: linear-gradient(#ff5a5a, #c81818 55%, #6e0808); }
+  .sbar > span {
+    position: relative; display: flex; justify-content: space-between; padding: 0 8px;
+    font-size: 13px; font-weight: 700; line-height: 20px;
+    text-shadow: 0 0 2px #000, 0 0 3px #000, 1px 1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000;
+  }
+
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .actions #copy { flex: 1; }
+
+  .notes { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 6px; font-size: 13.5px; font-weight: 600; text-shadow: 0 1px 0 #000; }
+  .notes li { padding: 6px 10px; border-radius: 3px; background: rgba(0,0,0,.35); border-left: 3px solid; }
+  .notes .err  { color: var(--red); border-color: var(--red); }
+  .notes .warn { color: #ffd84d; border-color: var(--gold-dk); }
+  .notes .tip  { color: #8fb4ff; border-color: var(--skill); font-weight: 400; }
+
+  .switch { display: flex; align-items: center; gap: 7px; cursor: pointer; }
+  .switch input { accent-color: var(--gold); width: 15px; height: 15px; margin: 0; }
+
+  .saved { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+  .saved .group {
+    font-family: var(--f-title); font-weight: 700; font-size: 12.5px; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--cls, var(--mute)); text-shadow: 0 1px 0 #000; padding: 10px 6px 4px; border-bottom: 1px solid var(--steel-dk); margin-bottom: 2px;
+  }
+  .saved .group:first-child { padding-top: 0; }
+  .saved .item { display: grid; grid-template-columns: minmax(0,1fr) auto auto auto; gap: 4px; align-items: center; padding: 3px 4px; border-radius: 4px; }
+  .saved .item:hover { background: rgba(79, 127, 255, .1); }
+  .saved .item.current { background: rgba(255, 209, 0, .07); box-shadow: inset 3px 0 0 var(--gold-dk); }
+  .saved .load { display: flex; align-items: center; gap: 9px; min-width: 0; background: none; border: 0; padding: 2px; text-align: left; }
+  .saved .load img, .saved .load .noicon { width: 26px; height: 26px; border-radius: 3px; flex: none; box-shadow: 0 0 0 1px #000, 0 0 0 2px #3b4060; background: var(--field); }
+  .saved .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; color: var(--q2); }
+  .saved .load:hover .name { color: var(--gold); }
+  .saved .meta { color: var(--mute); font-size: 12px; font-weight: 400; flex: none; }
+  .saved .btn.confirm { border-color: var(--red); color: var(--red); }
+  .saved-empty { color: var(--mute); font-size: 13.5px; font-style: italic; margin: 0; }
+
+  /* raid-warning style message */
+  .toast {
+    position: fixed; left: 50%; top: 18%; transform: translate(-50%, -8px);
+    font-family: var(--f-title); font-weight: 700; font-size: 20px; letter-spacing: .03em;
+    color: var(--gold); text-shadow: 0 0 3px #000, 1px 1px 0 #000, -1px -1px 0 #000, 0 0 16px rgba(255, 209, 0, .35);
+    opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  /* phone bar: counter and copy always in reach */
+  .mbar { display: none; }
+  @media (max-width: 960px) {
+    body { padding-bottom: 86px; }
+    .mbar {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
+      display: grid; grid-template-columns: minmax(0,1fr) auto auto; gap: 8px; align-items: center;
+      padding: 10px max(14px, env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+      background: rgba(5, 6, 13, .96); border-top: 1px solid var(--steel);
+      box-shadow: 0 -8px 24px rgba(0,0,0,.6);
+    }
+    .mbar .sbar { margin: 0; }
+    .mbar .btn, .mbar .wbtn { padding: 6px 14px; }
+  }
+
+  footer { margin-top: 22px; }
+  .links { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; padding-top: 14px; border-top: 1px solid var(--steel-dk); font-size: 14px; }
+  .links a { color: var(--mute); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+  .links a:hover { color: var(--gold); }
+  .footer-icon { width: 15px; height: 15px; fill: var(--gold); }
+  .ldot { color: var(--gold); font-size: 9px; align-self: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img class="logo" src="logo.png" alt="WoW Forever" onerror="this.remove()" />
+    <h1>WoW Forever Macro Creator</h1>
+    <p>Combine your class spells into one macro with modifier keys, targets, stances and conditions.</p>
+  </header>
+
+  <div class="layout">
+    <main>
+      <section class="card" id="macroCard">
+        <h2>Macro</h2>
+        <div class="grid-2">
+          <label class="field">Macro name (just for saving here)
+            <input type="text" id="name" maxlength="16" placeholder="e.g. Smart Heal" />
+          </label>
+          <label class="field">Class (spell search and stances)
+            <select id="cls"></select>
+          </label>
+          <label class="field">First line
+            <select id="tooltip">
+              <option value="auto">#showtooltip (icon and tooltip follow the spell)</option>
+              <option value="match">#showtooltip with each spell's conditions</option>
+              <option value="spell">#showtooltip a specific spell</option>
+              <option value="show">#show (icon only, no tooltip)</option>
+              <option value="off">None</option>
+            </select>
+          </label>
+          <label class="field" id="tooltipSpellWrap" hidden>Spell to show
+            <input type="text" id="tooltipSpell" list="spellList" placeholder="Spell or item name" />
+          </label>
+        </div>
+        <datalist id="spellList"></datalist>
+      </section>
+
+      <section class="card" id="extrasCard">
+        <h2>Extra lines <span class="hint">added around your spells</span></h2>
+        <div class="chips" id="extras"></div>
+      </section>
+
+      <section class="card" id="spellsCard">
+        <h2>Spells <span class="hint">checked top to bottom, the first match is cast</span></h2>
+        <div class="rows" id="rows"></div>
+        <button class="add-row" id="addRow" type="button">+ Add spell</button>
+      </section>
+    </main>
+
+    <aside class="side">
+      <section class="card" id="previewCard">
+        <h2>Preview <label class="switch hint"><input type="checkbox" id="compact" /> Compact spacing</label></h2>
+        <pre class="preview" id="preview"></pre>
+        <div class="sbar" id="meter"><i id="meterFill"></i><span><span><b id="count">0</b> / 255 characters</span><span id="left"></span></span></div>
+        <div class="actions">
+          <button class="wbtn green" id="copy" type="button">Copy macro</button>
+          <button class="wbtn" id="save" type="button">Save</button>
+          <button class="wbtn" id="reset" type="button">New</button>
+        </div>
+        <ul class="notes" id="notes"></ul>
+      </section>
+
+      <section class="card" id="savedCard">
+        <h2>Saved macros <span class="hint">click one to load it</span></h2>
+        <ul class="saved" id="saved"></ul>
+      </section>
+    </aside>
+  </div>
+
+  <footer>
+    <div class="links"><a href="https://discord.gg/bkk4nVXcjm" target="_blank" rel="noopener"><svg class="footer-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.865-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.74 19.74 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.11 13.11 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .078-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>Discord</a><span class="ldot" aria-hidden="true">&#9670;</span><a href="https://github.com/ChakraaThePanda/HTML-Projects/tree/main/tools/WoW-Forever-Macro-Creator" target="_blank" rel="noopener"><svg class="footer-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>GitHub</a><span class="ldot" aria-hidden="true">&#9670;</span><a href="https://chakraathepanda.github.io/HTML-Projects/">All Projects</a></div>
+  </footer>
+</div>
+<div class="mbar">
+  <div class="sbar" id="mMeter"><i id="mFill"></i><span><span><b id="mCount">0</b> / 255</span></span></div>
+  <button class="btn" id="mPreview" type="button">Preview</button>
+  <button class="wbtn green" id="mCopy" type="button">Copy</button>
+</div>
+<div class="suggest" id="suggest" hidden></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  'use strict';
+
+  const LIMIT = 255;
+  const DRAFT_KEY = 'wowMacroCreator.draft';
+  const SAVED_KEY = 'wowMacroCreator.saved';
+
+  const EXTRAS = [
+    { id: 'stopcasting', line: '/stopcasting', label: 'Stop casting first', pos: 'pre' },
+    { id: 'dismount',    line: '/dismount',    label: 'Dismount first', pos: 'pre' },
+    { id: 'startattack', line: '/startattack', label: 'Start auto attack', pos: 'pre' },
+    { id: 'petattack',   line: '/petattack',   label: 'Send pet to attack', pos: 'pre' },
+    { id: 'clearerrors', line: '/run UIErrorsFrame:Clear()', label: 'Hide red error text', pos: 'post' },
+  ];
+
+  const TARGETS = [
+    { v: '',             label: 'Current target',                    say: 'your target' },
+    { v: '@mouseover',   label: 'Mouseover',                         say: 'your mouseover' },
+    { v: '@player',      label: 'Yourself',                          say: 'yourself' },
+    { v: '@focus',       label: 'Focus',                             say: 'your focus' },
+    { v: '@targettarget',label: "Target's target",                   say: "your target's target" },
+    { v: '@pet',         label: 'Your pet',                          say: 'your pet' },
+    { v: '@cursor',      label: 'Cursor (ground spells, no click)',  say: 'the spot under your cursor' },
+  ];
+
+  // Class spells from the WoW Forever game files: class -> [name, icon, level each rank is learned].
+  // An empty level list means the spell has no ranks.
+  const SPELL_DATA = {"mage":[["Amplify Magic","spell_holy_flashheal",[18,30,42,54]],["Arcane Blast","spell_arcane_blast",[20,30,40,50,60]],["Arcane Brilliance","spell_holy_arcaneintellect",[]],["Arcane Explosion","spell_nature_wispsplode",[14,22,30,38,46,54]],["Arcane Intellect","spell_holy_magicalsentry",[1,14,28,42,56]],["Arcane Missiles","spell_nature_starfall",[8,16,24,32,40,48,56,56]],["Arcane Power","spell_nature_lightning",[]],["Arcane Wrath","ability_mage_netherwindpresence",[25,36,48,60]],["Blast Wave","spell_holy_excorcism_02",[30,36,44,52,60]],["Blink","spell_arcane_blink",[]],["Blizzard","spell_frost_icestorm",[20,28,36,44,52,60]],["Chilled","spell_frost_icestorm",[]],["Clearcasting","spell_shadow_manaburn",[]],["Cold Snap","spell_frost_wizardmark",[]],["Combustion","spell_fire_sealoffire",[]],["Cone of Cold","spell_frost_glacier",[26,34,42,50,58]],["Conjure Food","inv_misc_food_73cinnamonroll",[6,12,22,32,42,52,60]],["Conjure Mana Agate","inv_misc_gem_emerald_01",[]],["Conjure Mana Citrine","inv_misc_gem_opal_01",[]],["Conjure Mana Jade","inv_misc_gem_emerald_02",[]],["Conjure Mana Ruby","inv_misc_gem_ruby_01",[]],["Conjure Water","inv_drink_waterskin_11",[4,10,20,30,40,50,60,60]],["Counterspell","spell_frost_iceshock",[]],["Dampen Magic","spell_nature_abolishmagic",[12,24,36,48,60]],["Evocation","spell_nature_purge",[]],["Felfire","spell_fire_fireball",[]],["Fire Blast","spell_fire_fireball",[6,14,22,30,38,46,54]],["Fire Vulnerability","spell_fire_soulburn",[]],["Fire Ward","spell_fire_firearmor",[20,30,40,50,60]],["Fireball","spell_fire_flamebolt",[1,6,12,18,24,30,36,42,48,54,60,60]],["Flamestrike","spell_fire_selfdestruct",[16,24,32,40,48,56]],["Frost Armor","spell_frost_frostarmor02",[1,10,20]],["Frost Nova","spell_frost_frostnova",[10,26,40,54]],["Frost Ward","spell_frost_frostward",[22,32,42,52,60]],["Frostbite","spell_frost_frostarmor",[]],["Frostbolt","spell_frost_frostbolt02",[4,8,14,20,26,32,38,44,50,56,60]],["Frostfire Bolt","ability_mage_frostfirebolt",[40,50,60]],["Ice Armor","spell_frost_frostarmor02",[30,40,50,60]],["Ice Barrier","spell_ice_lament",[40,46,52,58]],["Ice Block","spell_frost_frost",[]],["Ice Lance","spell_frost_frostblast",[20,28,34,42,48,56]],["Impact","spell_fire_meteorstorm",[]],["Mage Armor","spell_magearmor",[34,46,58]],["Magic Absorption","spell_nature_astralrecalgroup",[]],["Mana Shield","spell_shadow_detectlesserinvisibility",[20,28,36,44,52,60]],["Master of Elements","spell_fire_masterofelements",[]],["Polymorph","spell_nature_polymorph",[8,20,40,60]],["Polymorph: Cow","spell_nature_polymorph_cow",[]],["Portal: Darnassus","spell_arcane_portaldarnassus",[]],["Portal: Ironforge","spell_arcane_portalironforge",[]],["Portal: Orgrimmar","spell_arcane_portalorgrimmar",[]],["Portal: Stormwind","spell_arcane_portalstormwind",[]],["Portal: Thunder Bluff","spell_arcane_portalthunderbluff",[]],["Portal: Undercity","spell_arcane_portalundercity",[]],["Presence of Mind","spell_nature_enchantarmor",[]],["Pyroblast","spell_fire_fireball02",[20,24,30,36,42,48,54,60]],["Remove Lesser Curse","spell_nature_removecurse",[]],["Scorch","spell_fire_soulburn",[22,28,34,40,46,52,58]],["Slow Fall","spell_magic_featherfall",[]],["Teleport: Dalaran","spell_arcane_teleporthalloftheguardian",[]],["Teleport: Darnassus","spell_arcane_teleportdarnassus",[]],["Teleport: Ironforge","spell_arcane_teleportironforge",[]],["Teleport: Orgrimmar","spell_arcane_teleportorgrimmar",[]],["Teleport: Stormwind","spell_arcane_teleportstormwind",[]],["Teleport: Thunder Bluff","spell_arcane_teleportthunderbluff",[]],["Teleport: Undercity","spell_arcane_teleportundercity",[]]],"druid":[["Abolish Poison","spell_nature_nullifypoison_02",[]],["Aquatic Form","ability_druid_aquaticform",[]],["Barkskin","spell_nature_stoneclawtotem",[]],["Bash","ability_druid_bash",[14,30,46]],["Bear Form","ability_racial_bearform",[]],["Cat Form","ability_druid_catform",[]],["Challenging Roar","ability_druid_challangingroar",[]],["Claw","ability_druid_rake",[20,28,38,48,58]],["Cower","ability_druid_cower",[28,40,52]],["Cure Poison","spell_nature_nullifypoison",[]],["Dash","ability_druid_dash",[26,46]],["Demoralizing Roar","ability_druid_demoralizingroar",[10,20,32,42,52]],["Dire Bear Form","ability_racial_bearform",[]],["Enrage","ability_druid_enrage",[]],["Entangling Roots","spell_nature_stranglevines",[8,18,28,38,48,58]],["Faerie Fire","spell_nature_faeriefire",[18,30,42,54]],["Feral Charge","ability_hunter_pet_bear",[]],["Ferocious Bite","ability_druid_ferociousbite",[24,32,40,48,56,60]],["Frenzied Regeneration","ability_bullrush",[]],["Gift of the Wild","spell_nature_regeneration",[50,60]],["Growl","ability_physical_taunt",[]],["Healing Touch","spell_nature_healingtouch",[1,8,14,20,26,32,38,44,50,56,60]],["Hibernate","spell_nature_sleep",[18,38,58]],["Hurricane","spell_nature_cyclone",[40,50,60]],["Innervate","spell_nature_lightning",[]],["Insect Swarm","spell_nature_insectswarm",[20,30,40,50,60]],["Lacerate","ability_druid_lacerate",[25,34,42,50,58]],["Mark of the Wild","spell_nature_regeneration",[1,10,20,30,40,50,60]],["Maul","ability_druid_maul",[10,18,26,34,42,50,58]],["Moonfire","spell_nature_starfall",[4,10,16,22,28,34,40,46,52,58]],["Moonkin Form","spell_nature_forceofnature",[]],["Nature's Grasp","spell_nature_natureswrath",[10,18,28,38,48,58]],["Nature's Swiftness","spell_nature_ravenform",[]],["Pounce","ability_druid_supriseattack",[36,46,56]],["Primal Bite","ability_racial_cannibalize",[40,50,60]],["Prowl","ability_ambush",[20,40,60]],["Rake","ability_druid_disembowel",[24,34,44,54]],["Ravage","ability_druid_ravage",[32,42,50,58]],["Rebirth","spell_nature_reincarnation",[20,30,40,50,60]],["Regrowth","spell_nature_resistnature",[12,18,24,30,36,42,48,54,60]],["Rejuvenation","spell_nature_rejuvenation",[4,10,16,22,28,34,40,46,52,58,60]],["Remove Curse","spell_holy_removecurse",[]],["Revive","ability_druid_lunarguidance",[12,24,36,48,60]],["Rip","ability_ghoulfrenzy",[20,28,36,44,52,60]],["Shred","spell_shadow_vampiricaura",[20,30,38,46,54]],["Soothe Animal","ability_hunter_beastsoothe",[22,38,54]],["Starfire","spell_arcane_starfire",[20,26,34,42,50,58,60]],["Swiftmend","inv_relics_idolofrejuvenation",[]],["Swipe","inv_misc_monsterclaw_03",[16,24,34,44,54]],["Teleport: Moonglade","spell_arcane_teleportmoonglade",[]],["Thorns","spell_nature_thorns",[6,14,24,34,44,54]],["Track Humanoids","ability_tracking",[]],["Tranquility","spell_nature_tranquility",[30,40,50,60]],["Travel Form","ability_druid_travelform",[]],["Wild Growth","ability_druid_flourish",[40,50,60]],["Wrath","spell_nature_abolishmagic",[1,6,14,22,30,38,46,54]]],"hunter":[["Aimed Shot","inv_spear_07",[20,28,36,44,52,60]],["Arcane Shot","ability_impalingbolt",[6,12,20,28,36,44,52,60]],["Aspect of the Beast","ability_mount_pinktiger",[30,40,50,60]],["Aspect of the Cheetah","ability_mount_jungletiger",[]],["Aspect of the Falcon","ability_hunter_pet_dragonhawk",[]],["Aspect of the Hawk","spell_nature_ravenform",[10,18,28,38,48,58,60]],["Aspect of the Monkey","ability_hunter_aspectofthemonkey",[]],["Aspect of the Pack","ability_mount_whitetiger",[]],["Aspect of the Viper","ability_hunter_aspectoftheviper",[]],["Aspect of the Wild","spell_nature_protectionformnature",[46,56]],["Auto Shot","ability_whirlwind",[]],["Beast Lore","ability_physical_taunt",[]],["Bestial Wrath","ability_druid_ferociousbite",[]],["Black Arrow","ability_theblackarrow",[50,60]],["Call Pet","ability_hunter_beastcall",[]],["Concussive Shot","spell_frost_stun",[]],["Counterattack","ability_warrior_challange",[30,30,42,54]],["Deterrence","ability_whirlwind",[]],["Disengage","ability_rogue_feint",[20,34,48]],["Dismiss Pet","spell_nature_spiritwolf",[]],["Distracting Shot","spell_arcane_blink",[12,20,30,40,50,60]],["Eagle Eye","ability_hunter_eagleeye",[]],["Enchanted Flare","ability_mage_arcanebarrage",[]],["Entrapment","spell_nature_stranglevines",[]],["Explosive Trap","spell_fire_selfdestruct",[34,44,54]],["Eyes of the Beast","ability_eyeoftheowl",[]],["Feed Pet","ability_hunter_beasttraining",[]],["Feign Death","ability_rogue_feigndeath",[]],["Flare","spell_fire_flare",[]],["Freezing Trap","spell_frost_chainsofice",[20,40,60]],["Frost Trap","spell_frost_freezingbreath",[]],["Heart of the Lion","ability_hunter_pet_cat",[]],["Hunter's Mark","ability_hunter_snipershot",[6,22,40,58]],["Immolation Trap","spell_fire_flameshock",[16,26,36,46,56]],["Improved Mend Pet","ability_hunter_mendpet",[]],["Intimidation","ability_devour",[]],["Lacerate","ability_gouge",[30,40,50,60]],["Mend Pet","ability_hunter_mendpet",[12,20,28,36,44,52,60]],["Mongoose Bite","ability_hunter_swiftstrike",[16,30,44,58]],["Multi-Shot","ability_upgrademoonglaive",[]],["Rapid Fire","ability_hunter_runningshot",[]],["Raptor Strike","ability_meleedamage",[1,8,16,24,32,40,48,56]],["Revive Pet","ability_hunter_beastsoothe",[]],["Scare Beast","ability_druid_cower",[14,30,46]],["Scatter Shot","ability_golemstormbolt",[]],["Scorpid Sting","ability_hunter_criticalshot",[]],["Serpent Sting","ability_hunter_quickshot",[4,10,18,26,34,42,50,58,60]],["Sniper Shot","hunter_pvp_snipershot",[40,48,58]],["Spirit Bond","ability_druid_demoralizingroar",[]],["Strider Kick","ability_hunter_pet_tallstrider",[]],["Summon Hawk","ability_hunter_animalhandler",[25,36,48,60]],["Tame Beast","ability_hunter_beasttaming",[]],["Track Beasts","ability_tracking",[]],["Track Demons","spell_shadow_summonfelhunter",[]],["Track Dragonkin","inv_misc_head_dragon_01",[]],["Track Elementals","spell_frost_summonwaterelemental",[]],["Track Giants","ability_racial_avatar",[]],["Track Hidden","ability_stealth",[]],["Track Humanoids","spell_holy_prayerofhealing",[]],["Track Undead","spell_shadow_darksummoning",[]],["Tranquilizing Shot","spell_nature_drowsy",[]],["Trueshot Aura","ability_trueshot",[25,32,40,50,60]],["Viper Sting","ability_hunter_aimedshot",[36,46,56]],["Volley","ability_marksmanship",[40,50,58]],["Wing Clip","ability_rogue_trip",[12,38,60]]],"warrior":[["Battle Shout","ability_warrior_battleshout",[1,12,22,32,42,52,60]],["Battle Stance","ability_warrior_offensivestance",[]],["Berserker Rage","spell_nature_ancestralguardian",[]],["Berserker Stance","ability_racial_avatar",[]],["Bloodrage","ability_racial_bloodrage",[]],["Bloodthirst","spell_nature_bloodlust",[40,48,54,60]],["Challenging Shout","ability_bullrush",[]],["Charge","ability_warrior_charge",[4,26,46]],["Cleave","ability_warrior_cleave",[20,30,40,50,60]],["Concussion Blow","ability_thunderbolt",[]],["Death Wish","spell_shadow_deathpact",[]],["Defensive Stance","ability_warrior_defensivestance",[]],["Demoralizing Shout","ability_warrior_warcry",[14,24,34,44,54]],["Disarm","ability_warrior_disarm",[]],["Execute","inv_sword_48",[24,32,40,48,56]],["Hamstring","ability_shockwave",[8,32,54]],["Heroic Strike","ability_rogue_ambush",[1,8,16,24,32,40,48,56,60]],["Intercept","ability_rogue_sprint",[30,42,52]],["Intimidating Shout","ability_golemthunderclap",[]],["Last Stand","spell_holy_ashestoashes",[]],["Long Daze","spell_frost_stun",[0]],["Mocking Blow","ability_warrior_punishingblow",[16,26,36,46,56]],["Mortal Strike","ability_warrior_savageblow",[40,48,54,60]],["Overpower","ability_meleedamage",[12,28,44,60]],["Piercing Howl","spell_shadow_deathscream",[]],["Pummel","inv_gauntlets_04",[38,58]],["Reckless Swings","ability_warrior_bloodfrenzy",[]],["Recklessness","ability_criticalstrike",[]],["Rend","ability_gouge",[4,10,20,30,40,50,60]],["Retaliation","ability_warrior_challange",[]],["Revenge","ability_warrior_revenge",[14,24,34,44,54,60]],["Shield Bash","ability_warrior_shieldbash",[12,32,52]],["Shield Block","ability_defend",[]],["Shield Slam","inv_shield_05",[40,48,54,60]],["Shield Wall","ability_warrior_shieldwall",[]],["Slam","ability_warrior_decisivestrike",[20,30,38,46,54]],["Spearing Strike","inv_spear_01",[]],["Sunder Armor","ability_warrior_sunder",[10,22,34,46,58]],["Sweeping Strikes","ability_rogue_slicedice",[]],["Taunt","spell_nature_reincarnation",[]],["Thunder Clap","spell_nature_thunderclap",[6,18,28,38,48,58]],["Unbridled Wrath","spell_nature_stoneclawtotem",[]],["Victory Rush","ability_warrior_devastate",[]],["Whirlwind","ability_whirlwind",[]]],"priest":[["Abolish Disease","spell_nature_nullifydisease",[]],["Blessed Recovery","spell_holy_blessedrecovery",[]],["Chastise","spell_holy_chastise",[20,30,40,50,60]],["Confounding Flash","ability_paladin_blindinglight2",[]],["Contingency Plan","ability_priest_soulwarding",[20,30,40,50,60]],["Cure Disease","spell_holy_nullifydisease",[]],["Dark Sacrifice","spell_holy_powerinfusion_shadow",[20,30,40,50,60]],["Desperate Prayer","spell_holy_restoration",[10,18,26,34,42,50,58]],["Devouring Plague","spell_shadow_devouringplague",[20,28,36,44,52,60]],["Dispel Magic","spell_holy_dispelmagic",[18,36]],["Divine Grace","ability_priest_savinggrace",[10,18,26,34,42,50,58]],["Divine Spirit","spell_holy_divinespirit",[30,40,50,60]],["Elune's Grace","spell_holy_elunesgrace",[]],["Fade","spell_magic_lesserinvisibilty",[8,20,30,40,50,60]],["Fear Ward","spell_holy_excorcism",[]],["Feedback","spell_shadow_ritualofsacrifice",[20,30,40,50,60]],["Flash Heal","spell_holy_flashheal",[20,26,32,38,44,50,56]],["Focused Casting","spell_arcane_blink",[]],["Greater Heal","spell_holy_greaterheal",[40,46,52,58,60]],["Heal","spell_holy_heal02",[16,22,28,34]],["Hex of Weakness","spell_shadow_fingerofdeath",[10,20,30,40,50,60]],["Holy Fire","spell_holy_searinglight",[20,24,30,36,42,48,54,60]],["Holy Nova","spell_holy_holynova",[20,28,36,44,52,60]],["Inner Fire","spell_holy_innerfire",[12,20,30,40,50,60]],["Inner Focus","spell_frost_windwalkon",[]],["Lesser Heal","spell_holy_lesserheal",[1,4,10]],["Levitate","spell_holy_layonhands",[]],["Lightwell","spell_holy_summonlightwell",[40,50,60]],["Lightwell Renew","spell_holy_summonlightwell",[40,50,60]],["Mana Burn","spell_shadow_manaburn",[24,32,40,48,56]],["Mind Blast","spell_shadow_unholyfrenzy",[10,16,22,28,34,40,46,52,58]],["Mind Control","spell_shadow_shadowworddominate",[30,44,58]],["Mind Flay","spell_shadow_siphonmana",[20,28,36,44,52,60]],["Mind Soothe","spell_holy_mindsooth",[20,36,52]],["Mind Vision","spell_holy_mindvision",[22,44]],["Penance","spell_holy_penance",[30,40,50,60]],["Power Infusion","spell_holy_powerinfusion",[]],["Power Word: Fortitude","spell_holy_wordfortitude",[1,12,24,36,48,60]],["Power Word: Shield","spell_holy_powerwordshield",[6,12,18,24,30,36,42,48,54,60]],["Prayer of Fortitude","spell_holy_prayeroffortitude",[48,60]],["Prayer of Healing","spell_holy_prayerofhealing02",[30,40,50,60,60]],["Prayer of Mending","spell_holy_prayerofmendingtga",[40,50,60]],["Prayer of Shadow Protection","spell_holy_prayerofshadowprotection",[]],["Prayer of Spirit","spell_holy_prayerofspirit",[60]],["Psychic Scream","spell_shadow_psychicscream",[14,28,42,56]],["Renew","spell_holy_renew",[8,14,20,26,32,38,44,50,56,60]],["Resurrection","spell_holy_resurrection",[10,22,34,46,58]],["Shackle Undead","spell_nature_slow",[20,40,60]],["Shadow Protection","spell_shadow_antishadow",[30,42,56]],["Shadow Word: Death","spell_shadow_demonicfortitude",[32,40,48,56]],["Shadow Word: Pain","spell_shadow_shadowwordpain",[4,10,18,26,34,42,50,58]],["Shadowfiend","spell_shadow_shadowfiend",[]],["Shadowform","spell_shadow_shadowform",[]],["Shadowguard","spell_nature_lightningshield",[20,28,36,44,52,60]],["Silence","spell_shadow_impphaseshift",[]],["Smite","spell_holy_holysmite",[1,6,14,22,30,38,46,54]],["Starshards","spell_arcane_starfire",[10,18,26,34,42,50,58]],["Touch of Weakness","spell_shadow_deadofnight",[10,20,30,40,50,60]],["Vampiric Embrace","spell_shadow_unsummonbuilding",[]]],"rogue":[["Adrenaline Rush","spell_shadow_shadowworddominate",[]],["Ambush","ability_rogue_ambush",[18,26,34,42,50,58]],["Backstab","ability_backstab",[4,12,20,28,36,44,52,60,60]],["Blade Flurry","ability_warrior_punishingblow",[]],["Blind","spell_shadow_mindsteal",[]],["Cheap Shot","ability_cheapshot",[]],["Cold Blood","spell_ice_lament",[]],["Death Mark","ability_creature_cursed_02",[40,48,56,60]],["Disarm Trap","spell_shadow_grimward",[]],["Distract","ability_rogue_distract",[]],["Evasion","spell_shadow_shadowward",[]],["Eviscerate","ability_rogue_eviscerate",[1,8,16,24,32,40,48,56,60]],["Expose Armor","ability_warrior_riposte",[14,26,36,46,56]],["Feint","ability_rogue_feint",[16,28,40,52,60]],["Garrote","ability_rogue_garrote",[14,22,30,38,46,54]],["Ghostly Strike","spell_shadow_curse",[]],["Gouge","ability_gouge",[6,18,32,46,60]],["Hemorrhage","spell_shadow_lifedrain",[]],["Initiative","spell_shadow_fumble",[]],["Kick","ability_kick",[12,26,42,58]],["Kidney Shot","ability_rogue_kidneyshot",[30,50]],["Mutilate","ability_rogue_deadlybrew",[40,50,60]],["Pick Pocket","inv_misc_bag_11",[]],["Premeditation","spell_shadow_possession",[]],["Preparation","spell_shadow_antishadow",[]],["Redirect","inv_throwingknife_01",[]],["Riposte","ability_warrior_challange",[]],["Rupture","ability_rogue_rupture",[20,28,36,44,52,60]],["Sap","ability_sap",[10,28,48]],["Shank","ability_theblackarrow",[24,44]],["Sinister Strike","spell_shadow_ritualofsacrifice",[1,6,14,22,30,38,46,54]],["Slice and Dice","ability_rogue_slicedice",[10,42]],["Sprint","ability_rogue_sprint",[10,34,58]],["Stealth","ability_stealth",[1,20,40,60]],["Vanish","ability_vanish",[22,42]]],"paladin":[["Blessing of Freedom","spell_holy_sealofvalor",[]],["Blessing of Kings","spell_magic_magearmor",[]],["Blessing of Might","spell_holy_fistofjustice",[4,12,22,32,42,52,60]],["Blessing of Protection","spell_holy_sealofprotection",[10,24,38]],["Blessing of Sacrifice","spell_holy_sealofsacrifice",[46,54]],["Blessing of Wisdom","spell_holy_sealofwisdom",[14,24,34,44,54,60]],["Cleanse","spell_holy_renew",[]],["Concentration Aura","spell_holy_mindsooth",[]],["Consecration","spell_holy_innerfire",[20,30,40,50,60]],["Devotion Aura","spell_holy_devotionaura",[1,10,20,30,40,50,60]],["Divine Favor","spell_holy_heal",[]],["Divine Intervention","spell_nature_timestop",[]],["Divine Protection","spell_holy_restoration",[6,18]],["Divine Shield","spell_holy_divineintervention",[34,50]],["Exorcism","spell_holy_excorcism_02",[20,28,36,44,52,60]],["Fire Resistance Aura","spell_fire_sealoffire",[36,48,60]],["Flash of Light","spell_holy_flashheal",[20,26,34,42,50,58]],["Frost Resistance Aura","spell_frost_wizardmark",[32,44,56]],["Greater Blessing of Kings","spell_magic_greaterblessingofkings",[]],["Greater Blessing of Might","spell_holy_greaterblessingofkings",[52,60]],["Greater Blessing of Wisdom","spell_holy_greaterblessingofwisdom",[54,60]],["Hammer of Justice","spell_holy_sealofmight",[8,24,40,54]],["Hammer of Wrath","ability_thunderclap",[44,52,60]],["Hammer of the Righteous","ability_paladin_hammeroftherighteous",[]],["Holy Light","spell_holy_holybolt",[1,6,14,22,30,38,46,54,60]],["Holy Shield","spell_holy_blessingofprotection",[30,40,50,60]],["Holy Shock","spell_holy_searinglight",[30,40,48,56]],["Holy Strike","classicon_paladin",[6,12,20,28,36,44,52,60]],["Holy Wrath","spell_holy_excorcism",[50,60]],["Judgement","spell_holy_righteousfury",[]],["Lay on Hands","spell_holy_layonhands",[10,30,50]],["Light's Vigil","ability_paladin_judgementofthepure",[40,50,60]],["Oath of Light","spell_holy_greaterblessingoflight",[]],["Purify","spell_holy_purify",[]],["Redemption","spell_holy_resurrection",[12,24,36,48,60]],["Repentance","spell_holy_prayerofhealing",[]],["Retribution Aura","spell_holy_auraoflight",[16,26,36,46,56]],["Righteous Fury","spell_holy_sealoffury",[]],["Seal of Command","ability_warrior_innerrage",[20,30,40,50,60]],["Seal of Fury","spell_holy_retributionaura",[10,18,26,34,42,50,58]],["Seal of Justice","spell_holy_sealofwrath",[]],["Seal of Light","spell_holy_healingaura",[30,40,50,60]],["Seal of Righteousness","ability_thunderbolt",[1,10,18,26,34,42,50,58]],["Seal of Wisdom","spell_holy_righteousnessaura",[38,48,58]],["Seal of the Crusader","spell_holy_holysmite",[6,12,22,32,42,52]],["Sense Undead","spell_holy_senseundead",[]],["Shadow Resistance Aura","spell_shadow_sealofkings",[28,40,52]],["Swift Judgement","ability_paladin_judgementred",[]],["Templar's Bulwark","ability_paladin_shieldofthetemplar",[]],["Turn Undead","spell_holy_turnundead",[24,38,52]],["Vindication","spell_holy_vindication",[0]],["Voice of Truth","inv_misc_horn_03",[]]],"warlock":[["Amplify Curse","spell_shadow_contagion",[]],["Bane of Agony","spell_shadow_curseofsargeras",[8,18,28,38,48,58]],["Bane of Doom","spell_shadow_auraofdarkness",[]],["Bane of Havoc","ability_warlock_baneofhavoc",[]],["Banish","spell_shadow_cripple",[28,48]],["Conflagrate","spell_fire_fireball",[25,32,40,48,54,60]],["Corruption","spell_shadow_abominationexplosion",[4,14,24,34,44,54,60]],["Create Firestone","inv_misc_gem_bloodstone_02",[28,36,46,56]],["Create Healthstone","inv_stone_04",[10,22,34,46,58]],["Create Soulstone","spell_shadow_soulgem",[18,30,40,50,60]],["Create Spellstone","inv_misc_gem_sapphire_01",[36,48,60]],["Curse of Exhaustion","spell_shadow_grimward",[]],["Curse of Recklessness","spell_shadow_unholystrength",[14,28,42,56]],["Curse of Tongues","spell_shadow_curseoftounges",[26,50]],["Curse of Weakness","spell_shadow_curseofmannoroth",[4,12,22,32,42,52]],["Curse of the Elements","warlock_curse_shadow",[20,30,40,50]],["Death Coil","spell_shadow_deathcoil",[42,50,58]],["Demon Armor","spell_shadow_ragingscream",[20,30,40,50,60]],["Demon Skin","spell_shadow_ragingscream",[1,10]],["Demonic Sacrifice","spell_shadow_psychicscream",[]],["Detect Invisibility","spell_shadow_detectinvisibility",[26,38,50]],["Drain Life","spell_shadow_lifedrain02",[14,22,30,38,46,54]],["Drain Mana","spell_shadow_siphonmana",[24,34,44,54]],["Drain Soul","spell_shadow_haunting",[10,24,38,52]],["Eye of Kilrogg","spell_shadow_evileye",[]],["Fear","spell_shadow_possession",[8,32,56]],["Fel Domination","spell_nature_removecurse",[]],["Health Funnel","spell_shadow_lifedrain",[12,20,28,36,44,52,60]],["Hellfire","spell_fire_incinerate",[30,42,54]],["Howl of Terror","spell_shadow_deathscream",[40,54]],["Immolate","spell_fire_immolation",[1,10,20,30,40,50,60,60]],["Incinerate","spell_fire_burnout",[40,50,60]],["Inferno","spell_shadow_summoninfernal",[]],["Life Tap","spell_shadow_burningspirit",[6,16,26,36,46,56]],["Master Demonologist","spell_shadow_shadowpact",[]],["Portal of Summoning","inv_misc_rune_10",[]],["Pyroclasm","spell_fire_volcano",[]],["Rain of Fire","spell_shadow_rainoffire",[20,34,46,58]],["Ritual of Doom","spell_shadow_antimagicshell",[]],["Ritual of Summoning","spell_shadow_twilight",[]],["Searing Pain","spell_fire_soulburn",[18,26,34,42,50,58]],["Sense Demons","spell_shadow_metamorphosis",[]],["Shadow Bolt","spell_shadow_shadowbolt",[1,6,12,20,28,36,44,52,60,60]],["Shadow Ward","spell_shadow_antishadow",[32,42,52,60]],["Shadowburn","spell_shadow_scourgebuild",[20,24,32,40,48,56]],["Siphon Life","spell_shadow_requiem",[30,38,48,58]],["Soul Fire","spell_fire_fireball02",[48,56]],["Soul Link","spell_shadow_gathershadows",[]],["Subjugate Demon","spell_shadow_enslavedemon",[30,44,58]],["Summon Felhunter","spell_shadow_summonfelhunter",[]],["Summon Imp","spell_shadow_summonimp",[]],["Summon Incubus","ability_warlock_incubus",[]],["Summon Succubus","spell_shadow_summonsuccubus",[]],["Summon Voidwalker","spell_shadow_summonvoidwalker",[]],["Unending Breath","spell_shadow_demonbreath",[]],["Wrack","ability_deathknight_hemorrhagicfever",[40]]],"shaman":[["Ancestral Fortitude","spell_nature_undyingstrength",[]],["Ancestral Spirit","spell_nature_regenerate",[12,24,36,48,60]],["Astral Recall","spell_nature_astralrecal",[]],["Call of the Ancestors","spell_shaman_dropall_02",[]],["Call of the Elements","spell_shaman_dropall_01",[]],["Call of the Spirits","spell_shaman_dropall_03",[]],["Chain Heal","spell_nature_healingwavegreater",[40,46,54]],["Chain Lightning","spell_nature_chainlightning",[32,40,48,56]],["Cure Disease","spell_nature_removedisease",[]],["Cure Poison","spell_nature_nullifypoison",[]],["Disease Cleansing Totem","spell_nature_diseasecleansingtotem",[]],["Earth Shock","spell_nature_earthshock",[4,8,14,24,36,48,60]],["Earthbind Totem","spell_nature_strengthofearthtotem02",[]],["Elemental Devastation","spell_fire_elementaldevastation",[]],["Far Sight","spell_nature_farsight",[]],["Fire Nova","spell_fire_sealoffire",[12,22,32,42,52]],["Fire Resistance Totem","spell_fireresistancetotem_01",[28,42,58]],["Flame Shock","spell_fire_flameshock",[10,18,28,40,52,60]],["Flametongue Totem","spell_nature_guardianward",[28,38,48,58]],["Flametongue Weapon","spell_fire_flametounge",[10,18,26,36,46,56]],["Frost Resistance Totem","spell_frostresistancetotem_01",[24,38,54]],["Frost Shock","spell_frost_frostshock",[20,34,46,58]],["Frostbrand Weapon","spell_frost_frostbrand",[20,28,38,48,58]],["Ghost Wolf","spell_nature_spiritwolf",[]],["Grace of Air Totem","spell_nature_invisibilitytotem",[42,56,60]],["Grounding Totem","spell_nature_groundingtotem",[]],["Healing Stream Totem","inv_spear_04",[20,30,40,50,60]],["Healing Wave","spell_nature_magicimmunity",[1,6,12,18,24,32,40,48,56,60]],["Lesser Healing Wave","spell_nature_healingwavelesser",[20,28,36,44,52,60]],["Lightning Bolt","spell_nature_lightning",[1,8,14,20,26,32,38,44,50,56]],["Lightning Mastery","spell_nature_unrelentingstorm",[]],["Lightning Shield","spell_nature_lightningshield",[8,16,24,32,40,48,56]],["Magma Totem","spell_fire_selfdestruct",[26,36,46,56]],["Mana Spring Totem","spell_nature_manaregentotem",[26,36,46,56]],["Mana Tide Totem","spell_frost_summonwaterelemental",[1,38,48,58]],["Nature Resistance Totem","spell_nature_natureresistancetotem",[30,44,60]],["Nature's Swiftness","spell_nature_ravenform",[]],["Poison Cleansing Totem","spell_nature_poisoncleansingtotem",[]],["Purge","spell_nature_purge",[12,32]],["Rage of the Farseer","spell_nature_bloodlust",[]],["Reincarnation","spell_nature_reincarnation",[]],["Riptide","spell_nature_riptide",[40,50,60]],["Rockbiter Weapon","spell_nature_rockbiter",[1,8,16,24,34,44,54]],["Searing Totem","spell_fire_searingtotem",[10,20,30,40,50,60]],["Sentry Totem","spell_nature_removecurse",[]],["Stoneclaw Totem","spell_nature_stoneclawtotem",[8,18,28,38,48,58]],["Stoneskin Totem","spell_nature_stoneskintotem",[4,14,24,34,44,54]],["Stormstrike","ability_shaman_stormstrike",[]],["Strength of Earth Totem","spell_nature_earthbindtotem",[10,24,38,52,60]],["Totemic Call","ability_shaman_totemrelocation",[]],["Totemic Recall","spell_shaman_totemrecall",[]],["Tremor Totem","spell_nature_tremortotem",[]],["Water Breathing","spell_shadow_demonbreath",[]],["Water Walking","spell_frost_windwalkon",[]],["Windfury Totem","spell_nature_windfury",[32,42,52]],["Windfury Weapon","spell_nature_cyclone",[30,40,50,60]],["Windwall Totem","spell_nature_earthbind",[36,46,56]]]};
+  const ICON_URL = icon => `https://wow.zamimg.com/images/wow/icons/medium/${icon}.jpg`;
+
+  // [stance number, short label, wording after "you are"]. Numbers follow the stance bar,
+  // left to right; druid numbers assume the usual set of forms.
+  const CLASSES = [
+    { v: '',        label: 'Any class' },
+    { v: 'druid',   label: 'Druid', stances: [
+      ['0', 'Caster', 'in caster form'], ['1', 'Bear', 'in Bear Form'], ['2', 'Aquatic', 'in Aquatic Form'],
+      ['3', 'Cat', 'in Cat Form'], ['4', 'Travel', 'in Travel Form'], ['5', 'Moonkin', 'in Moonkin Form'],
+    ] },
+    { v: 'hunter',  label: 'Hunter' },
+    { v: 'mage',    label: 'Mage' },
+    { v: 'paladin', label: 'Paladin' },
+    { v: 'priest',  label: 'Priest',  stances: [['0', 'Normal', 'not in Shadowform'], ['1', 'Shadowform', 'in Shadowform']] },
+    { v: 'rogue',   label: 'Rogue',   stances: [['0', 'Not stealthed', 'not stealthed'], ['1', 'Stealth', 'stealthed']] },
+    { v: 'shaman',  label: 'Shaman',  stances: [['0', 'Normal', 'not in Ghost Wolf'], ['1', 'Ghost Wolf', 'in Ghost Wolf']] },
+    { v: 'warlock', label: 'Warlock' },
+    { v: 'warrior', label: 'Warrior', stances: [
+      ['1', 'Battle', 'in Battle Stance'], ['2', 'Defensive', 'in Defensive Stance'], ['3', 'Berserker', 'in Berserker Stance'],
+    ] },
+  ];
+
+  // Every spell as { name, icon, levels, cls }, plus a lookup by lower-case name per class.
+  const ALL_SPELLS = Object.entries(SPELL_DATA).flatMap(([cls, list]) =>
+    list.map(([name, icon, levels]) => ({ name, icon, levels, cls })));
+  const classLabel = v => CLASSES.find(c => c.v === v)?.label || '';
+  const spellPool = () => SPELL_DATA[state.cls] ? ALL_SPELLS.filter(x => x.cls === state.cls) : ALL_SPELLS;
+  const findSpell = name => {
+    const key = name.trim().toLowerCase();
+    if (!key) return null;
+    const pool = spellPool();
+    return pool.find(x => x.name.toLowerCase() === key) || ALL_SPELLS.find(x => x.name.toLowerCase() === key) || null;
+  };
+  // the name as it goes in the macro, with "(Rank N)" when a lower rank is picked
+  const spellText = r => {
+    const name = r.spell.trim();
+    const known = findSpell(name);
+    return r.rank && r.cmd === '/cast' && known && known.levels.length >= +r.rank ? `${name}(Rank ${r.rank})` : name;
+  };
+  const stancesFor = cls => CLASSES.find(c => c.v === cls)?.stances || [];
+  // the ticked stances that belong to the current class, in stance-bar order
+  const stancesOf = r => stancesFor(state.cls).filter(([code]) => r.stances.includes(code)).sort((a, b) => a[0] - b[0]);
+  let openStance = null; // row id whose stance list is open, kept open across re-renders
+
+  const MODS = [
+    { v: 'shift', label: 'Shift' },
+    { v: 'ctrl',  label: 'Ctrl' },
+    { v: 'alt',   label: 'Alt' },
+  ];
+
+  // `group` makes conditions replace each other; `self` ones are about you, the rest about the target.
+  const CONDS = [
+    { v: 'help',         label: 'Friendly',        say: 'friendly',          group: 'react' },
+    { v: 'harm',         label: 'Enemy',           say: 'an enemy',          group: 'react' },
+    { v: 'exists',       label: 'Exists',          say: 'there' },
+    { v: 'nodead',       label: 'Alive',           say: 'alive',             group: 'life' },
+    { v: 'dead',         label: 'Dead',            say: 'dead',              group: 'life' },
+    { v: 'combat',       label: 'In combat',       say: 'you are in combat',       group: 'combat', self: true },
+    { v: 'nocombat',     label: 'Out of combat',   say: 'you are out of combat',   group: 'combat', self: true },
+    { v: 'stealth',      label: 'Stealthed',       say: 'you are stealthed',       group: 'stealth', self: true },
+    { v: 'nostealth',    label: 'Not stealthed',   say: 'you are not stealthed',   group: 'stealth', self: true },
+    { v: 'mounted',      label: 'Mounted',         say: 'you are mounted',         group: 'mount', self: true },
+    { v: 'nomounted',    label: 'Not mounted',     say: 'you are not mounted',     group: 'mount', self: true },
+    { v: 'swimming',     label: 'Swimming',        say: 'you are swimming',        group: 'swim', self: true },
+    { v: 'noswimming',   label: 'Not swimming',    say: 'you are not swimming',    group: 'swim', self: true },
+    { v: 'indoors',      label: 'Indoors',         say: 'you are indoors',         group: 'place', self: true },
+    { v: 'outdoors',     label: 'Outdoors',        say: 'you are outdoors',        group: 'place', self: true },
+    { v: 'nochanneling', label: 'Not channeling',  say: 'you are not channeling',  self: true },
+  ];
+
+  const $ = id => document.getElementById(id);
+  const el = (tag, props = {}, ...kids) => {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(props)) {
+      if (k === 'class') n.className = v;
+      else if (k === 'on') for (const [ev, fn] of Object.entries(v)) n.addEventListener(ev, fn);
+      else if (k in n && typeof v !== 'string') n[k] = v;
+      else n.setAttribute(k, v);
+    }
+    for (const kid of kids.flat()) if (kid != null) n.append(kid);
+    return n;
+  };
+
+  // small line icons for the row buttons
+  const ICONS = {
+    up:   '<path d="M8 13V3M4 7l4-4 4 4"/>',
+    down: '<path d="M8 3v10M4 9l4 4 4-4"/>',
+    copy: '<rect x="5.5" y="5.5" width="7.5" height="7.5" rx="1"/><path d="M3 10.5V3h7.5"/>',
+    x:    '<path d="M4 4l8 8M12 4l-8 8"/>',
+  };
+  const icon = name => {
+    const t = document.createElement('template');
+    t.innerHTML = `<svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]}</svg>`;
+    return t.content.firstChild;
+  };
+
+  let uid = 0;
+  const newRow = () => ({ id: ++uid, cmd: '/cast', spell: '', mods: [], nomod: false, target: '', stances: [], conds: [], rank: '' });
+  const freshState = () => ({
+    name: '', cls: '', tooltip: 'auto', tooltipSpell: '', compact: false, extras: [],
+    rows: [newRow()],
+  });
+
+  const store = {
+    get(key, fallback) {
+      try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }
+      catch { return fallback; }
+    },
+    set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* storage unavailable */ } },
+  };
+
+  // Rebuild a stored macro (draft or saved), filling in anything missing or malformed,
+  // so data saved by older versions of this page still loads.
+  function normalize(s) {
+    const base = freshState();
+    if (!s || typeof s !== 'object') return base;
+    const str = v => typeof v === 'string' ? v : '';
+    const list = v => Array.isArray(v) ? v.filter(x => typeof x === 'string') : [];
+    const rows = Array.isArray(s.rows) ? s.rows.filter(r => r && typeof r === 'object') : [];
+    return {
+      name: str(s.name),
+      cls: SPELL_DATA[s.cls] ? s.cls : '',
+      tooltip: ['auto', 'match', 'spell', 'show', 'off'].includes(s.tooltip) ? s.tooltip : 'auto',
+      tooltipSpell: str(s.tooltipSpell),
+      compact: s.compact === true,
+      extras: list(s.extras).filter(x => EXTRAS.some(e => e.id === x)),
+      rows: rows.length ? rows.map(r => ({
+        ...newRow(),
+        cmd: r.cmd === '/use' ? '/use' : '/cast',
+        spell: str(r.spell),
+        mods: list(r.mods),
+        nomod: r.nomod === true,
+        target: TARGETS.some(t => t.v === r.target) ? r.target : '',
+        stances: Array.isArray(r.stances) ? list(r.stances) : str(r.stance) ? r.stance.split('/') : [],
+        conds: list(r.conds),
+        rank: str(r.rank),
+      })) : base.rows,
+    };
+  }
+
+  let state = normalize(store.get(DRAFT_KEY, null));
+
+  /* ---------- macro building ---------- */
+
+  function rowConditions(r) {
+    const parts = [];
+    if (r.target) parts.push(r.target);
+    if (r.nomod) parts.push('nomod');
+    else for (const m of MODS) if (r.mods.includes(m.v)) parts.push('mod:' + m.v);
+    const st = stancesOf(r);
+    if (st.length) parts.push('stance:' + st.map(x => x[0]).join('/'));
+    for (const c of CONDS) if (r.conds.includes(c.v)) parts.push(c.v);
+    return parts;
+  }
+
+  // Returns lines plus per-row info (which line it's on, whether it can ever fire).
+  function build() {
+    const sp = state.compact ? '' : ' ';
+    const lines = [];
+    const rowInfo = new Map();
+
+    if (state.tooltip === 'auto') lines.push('#showtooltip');
+    else if (state.tooltip === 'show') lines.push('#show');
+    else if (state.tooltip === 'spell') lines.push(('#showtooltip ' + state.tooltipSpell.trim()).trim());
+    // the first line repeats each spell with its conditions, so the icon follows them across every line
+    const tooltip = state.tooltip === 'match' ? { cmd: '#showtooltip', clauses: [] } : null;
+    if (tooltip) lines.push(tooltip);
+
+    for (const e of EXTRAS) if (e.pos === 'pre' && state.extras.includes(e.id)) lines.push(e.line);
+
+    // Consecutive rows with the same command share one line, separated by ";".
+    let current = null;
+    let caughtAll = false;   // an earlier clause on this line has no conditions
+    let tooltipDone = false; // the first line already has a clause with no conditions
+    for (const r of state.rows) {
+      if (!r.spell.trim()) continue;
+      if (!current || current.cmd !== r.cmd) {
+        current = { cmd: r.cmd, clauses: [] };
+        lines.push(current);
+        caughtAll = false;
+      }
+      const conds = rowConditions(r);
+      rowInfo.set(r.id, { dead: caughtAll, fallback: conds.length === 0 });
+      const clause = (conds.length ? '[' + conds.join(',') + ']' + sp : '') + spellText(r);
+      current.clauses.push(clause);
+      if (tooltip && !caughtAll && !tooltipDone && !tooltip.clauses.includes(clause)) tooltip.clauses.push(clause);
+      if (!conds.length) { caughtAll = true; tooltipDone = true; }
+    }
+
+    for (const e of EXTRAS) if (e.pos === 'post' && state.extras.includes(e.id)) lines.push(e.line);
+
+    const text = lines
+      .map(l => typeof l === 'string' ? l : (l.cmd + ' ' + l.clauses.join(';' + sp)).trim())
+      .join('\n');
+    return { text, rowInfo };
+  }
+
+  // Bytes, because the game counts UTF-8 bytes (accented letters count as 2).
+  const enc = new TextEncoder();
+  const byteLen = s => enc.encode(s).length;
+
+  const listJoin = a => a.length < 2 ? a.join('') : a.slice(0, -1).join(', ') + ' and ' + a.at(-1);
+
+  function describeRow(r) {
+    const spell = r.spell.trim();
+    if (!spell) return null;
+    const when = [];
+    if (r.nomod) when.push('no modifier key is held');
+    else if (r.mods.length) {
+      const names = MODS.filter(m => r.mods.includes(m.v)).map(m => m.label);
+      when.push(names.join(' + ') + ' ' + (names.length > 1 ? 'are' : 'is') + ' held');
+    }
+    const t = TARGETS.find(t => t.v === r.target) || TARGETS[0];
+    const unitConds = CONDS.filter(c => !c.self && r.conds.includes(c.v)).map(c => c.say);
+    if (unitConds.length) when.push(t.say + ' is ' + unitConds.join(' and '));
+    const st = stancesOf(r);
+    if (st.length) when.push('you are ' + st.map(x => x[2]).join(' or '));
+    for (const c of CONDS) if (c.self && r.conds.includes(c.v)) when.push(c.say);
+    const verb = r.cmd === '/use' ? 'Use' : 'Cast';
+    const on = !r.target ? '' : unitConds.length ? ' on them' : ' on ' + t.say;
+    return { verb, spell: spellText(r).replace('(Rank', ' (Rank'), on, when };
+  }
+
+  /* ---------- rendering ---------- */
+
+  // `code` shows the macro text in the chip; `tip` only in the hover tooltip.
+  function chip(label, pressed, onClick, extraClass = '', code = '', tip = '') {
+    const props = { type: 'button', class: 'chip ' + extraClass, 'aria-pressed': String(pressed), on: { click: onClick } };
+    if (tip) props.title = tip;
+    return el('button', props, label, code ? el('code', {}, ' ' + code) : null);
+  }
+
+  function renderExtras() {
+    $('extras').replaceChildren(...EXTRAS.map(e => chip(e.label, state.extras.includes(e.id), () => {
+      state.extras = state.extras.includes(e.id) ? state.extras.filter(x => x !== e.id) : [...state.extras, e.id];
+      renderExtras();
+      refresh();
+      $('extras').querySelector(`[data-focus="extra:${e.id}"]`)?.focus();
+    }, '', e.line.split(' ')[0])));
+    $('extras').querySelectorAll('.chip').forEach((c, k) => { c.dataset.focus = 'extra:' + EXTRAS[k].id; });
+  }
+
+  function moveRow(i, d) {
+    const j = i + d;
+    if (j < 0 || j >= state.rows.length) return;
+    [state.rows[i], state.rows[j]] = [state.rows[j], state.rows[i]];
+    refresh();
+  }
+
+  // Tag a control so focus can come back to it after the rows are rebuilt.
+  const focusKey = (node, r, role) => { node.dataset.focus = `${r.id}:${role}`; return node; };
+
+  const rowClass = info => 'row' + (info.dead ? ' dead' : info.fallback ? ' fallback' : '');
+
+  function rowNote(r, info) {
+    const d = describeRow(r);
+    if (!d) return el('div', { class: 'row-note' }, 'Type a name to add this to the macro.');
+    if (info.dead) return el('div', { class: 'row-note bad' },
+      'This never happens: a spell above it on the same line has no conditions, so it always wins first.');
+    return el('div', { class: 'row-note' },
+      d.when.length ? 'When ' + listJoin(d.when) + ': ' : (state.rows.length > 1 ? 'Otherwise: ' : ''),
+      d.verb.toLowerCase() + ' ', el('b', {}, d.spell), d.on + '.');
+  }
+
+  // The spell icon and rank picker that sit around a spell box.
+  function spellExtras(r) {
+    const known = r.cmd === '/cast' ? findSpell(r.spell) : null;
+    const img = known?.icon ? el('img', { class: 'spell-icon', src: ICON_URL(known.icon), alt: '', referrerpolicy: 'no-referrer' }) : null;
+    let rankSel = null;
+    if (known && known.levels.length > 1) {
+      rankSel = focusKey(el('select', { class: 'rank', title: 'Leave on highest to always cast your best rank', on: { change: e => { r.rank = e.target.value; refresh(); } } },
+        el('option', { value: '' }, 'Highest rank'),
+        ...known.levels.map((lvl, k) => el('option', { value: String(k + 1) }, `Rank ${k + 1} (level ${lvl})`))), r, 'rank');
+      rankSel.value = known.levels.length >= +r.rank ? r.rank : '';
+    }
+    return { img, rankSel };
+  }
+
+  function renderRows(rowInfo) {
+    const rows = state.rows.map((r, i) => {
+      const info = rowInfo.get(r.id) || {};
+      const spellInput = el('input', {
+        type: 'text', value: r.spell, autocomplete: 'off',
+        placeholder: r.cmd === '/use' ? 'Item name or slot (13 / 14 = trinkets)' : 'Start typing a spell name',
+        on: {
+          input: e => typeSpell(r, e.target.value),
+          focus: e => openSuggest(r, e.target.value),
+          keydown: e => suggestKey(e),
+          blur: () => setTimeout(() => {
+            if (document.activeElement?.dataset?.rowId !== String(r.id)) closeSuggest();
+          }, 0),
+        },
+      });
+      spellInput.dataset.rowId = r.id;
+      focusKey(spellInput, r, 'spell');
+      const { img, rankSel } = spellExtras(r);
+      spellInput.classList.toggle('has-icon', !!img);
+      const spellBox = el('div', { class: 'spell-wrap' }, img, spellInput, rankSel);
+
+      const cmdSel = focusKey(el('select', { on: { change: e => { r.cmd = e.target.value; refresh(); } } },
+        el('option', { value: '/cast' }, '/cast'), el('option', { value: '/use' }, '/use')), r, 'cmd');
+      cmdSel.value = r.cmd;
+
+      const targetSel = focusKey(el('select', { on: { change: e => { r.target = e.target.value; refresh(); } } },
+        ...TARGETS.map(t => el('option', { value: t.v }, t.label + (t.v ? '  (' + t.v + ')' : '')))), r, 'target');
+      targetSel.value = r.target;
+
+      const modChips = [
+        ...MODS.map(m => focusKey(chip(m.label, !r.nomod && r.mods.includes(m.v), () => {
+          r.nomod = false;
+          r.mods = r.mods.includes(m.v) ? r.mods.filter(x => x !== m.v) : [...r.mods, m.v];
+          refresh();
+        }, 'mod', '', 'mod:' + m.v), r, 'mod-' + m.v)),
+        focusKey(chip('None', r.nomod, () => { r.nomod = !r.nomod; if (r.nomod) r.mods = []; refresh(); }, 'mod', '', 'nomod: only when no modifier key is held'), r, 'nomod'),
+      ];
+
+      const stances = stancesFor(state.cls);
+      let stanceLine = null;
+      if (stances.length) {
+        const picked = stancesOf(r);
+        const box = el('details', { class: 'msel', on: { toggle: e => {
+          if (e.target.open) {
+            openStance = r.id;
+            // only one stance list open at a time
+            document.querySelectorAll('.msel[open]').forEach(d => { if (d !== e.target) d.open = false; });
+          } else if (openStance === r.id) openStance = null;
+        } } },
+          focusKey(el('summary', {}, picked.length ? picked.map(x => x[1]).join(', ') : 'Any'), r, 'stances'),
+          el('div', { class: 'msel-panel' }, ...stances.map(([code, label]) => el('label', {},
+            focusKey(el('input', { type: 'checkbox', checked: r.stances.includes(code), on: { change: e => {
+              r.stances = e.target.checked ? [...r.stances, code] : r.stances.filter(x => x !== code);
+              refresh();
+            } } }), r, 'stance-' + code),
+            label, el('code', {}, code)))));
+        box.open = openStance === r.id;
+        stanceLine = el('div', { class: 'row-sub' }, el('span', {}, 'Stance'), box);
+      }
+
+      // Only the conditions in use are shown; the rest live in one dropdown so rows stay short.
+      const condChips = CONDS.filter(c => r.conds.includes(c.v)).map(c => chip([c.label, icon('x')], true, () => {
+        r.conds = r.conds.filter(x => x !== c.v);
+        refresh();
+      }, 'cond', '', c.v + ' (click to remove)'));
+      const condGroup = (label, self) => el('optgroup', { label },
+        ...CONDS.filter(c => !!c.self === self && !r.conds.includes(c.v))
+          .map(c => el('option', { value: c.v }, c.label)));
+      const condSel = focusKey(el('select', { class: 'add-cond', on: { change: e => {
+        const c = CONDS.find(o => o.v === e.target.value);
+        if (!c) return;
+        r.conds = [...r.conds.filter(x => !c.group || CONDS.find(o => o.v === x)?.group !== c.group), c.v];
+        refresh();
+      } } },
+        el('option', { value: '' }, '+ Add condition'),
+        condGroup('Target is', false),
+        condGroup('You are', true)), r, 'add-cond');
+      condSel.value = '';
+      condChips.push(condSel);
+
+      const rowEl = el('div', { class: rowClass(info) },
+        el('div', { class: 'row-top' },
+          el('span', { class: 'row-num' }, String(i + 1)),
+          cmdSel,
+          spellBox,
+          el('div', { class: 'row-tools' },
+            el('button', { type: 'button', class: 'btn icon', 'data-focus': `${r.id}:up`, title: 'Move up', disabled: i === 0, on: { click: () => moveRow(i, -1) } }, icon('up')),
+            el('button', { type: 'button', class: 'btn icon', 'data-focus': `${r.id}:down`, title: 'Move down', disabled: i === state.rows.length - 1, on: { click: () => moveRow(i, 1) } }, icon('down')),
+            el('button', { type: 'button', class: 'btn icon', 'data-focus': `${r.id}:copy`, title: 'Duplicate', on: { click: () => {
+              state.rows.splice(i + 1, 0, { ...structuredClone(r), id: ++uid });
+              refresh();
+            } } }, icon('copy')),
+            el('button', { type: 'button', class: 'btn icon danger', 'data-focus': `${r.id}:remove`, title: 'Remove', disabled: state.rows.length === 1, on: { click: () => {
+              state.rows.splice(i, 1);
+              refresh();
+            } } }, icon('x')),
+          ),
+        ),
+        el('div', { class: 'row-pair' },
+          el('div', { class: 'row-sub' }, el('span', {}, 'Keys'), el('div', { class: 'chips' }, modChips)),
+          el('div', { class: 'row-sub' }, el('span', {}, 'Target'), targetSel),
+        ),
+        stanceLine
+          ? el('div', { class: 'row-pair' }, stanceLine, el('div', { class: 'row-sub' }, el('span', {}, 'Only if'), el('div', { class: 'chips' }, condChips)))
+          : el('div', { class: 'row-sub' }, el('span', {}, 'Only if'), el('div', { class: 'chips' }, condChips)),
+        rowNote(r, info),
+      );
+      rowEl.dataset.row = r.id;
+      return rowEl;
+    });
+    $('rows').replaceChildren(...rows);
+  }
+
+  // Typing in a spell box: update everything around it but never rebuild the box itself,
+  // so phone keyboards (word suggestions, autocorrect) aren't interrupted mid-word.
+  function typeSpell(r, value) {
+    if (r.rank && value.trim().toLowerCase() !== r.spell.trim().toLowerCase()) r.rank = ''; // a new spell starts at its highest rank
+    r.spell = value;
+    const { rowInfo } = refreshOutputs();
+    for (const row of state.rows) {
+      const rowEl = $('rows').querySelector(`.row[data-row="${row.id}"]`);
+      if (!rowEl) continue;
+      const info = rowInfo.get(row.id) || {};
+      rowEl.className = rowClass(info);
+      rowEl.querySelector('.row-note').replaceWith(rowNote(row, info));
+    }
+    const wrap = $('rows').querySelector(`.row[data-row="${r.id}"] .spell-wrap`);
+    if (wrap) {
+      wrap.querySelectorAll('.spell-icon, .rank').forEach(n => n.remove());
+      const input = wrap.querySelector('input');
+      const { img, rankSel } = spellExtras(r);
+      input.classList.toggle('has-icon', !!img);
+      if (img) wrap.prepend(img);
+      if (rankSel) wrap.append(rankSel);
+    }
+    openSuggest(r, value);
+  }
+
+  // Colored preview; anything past the limit is struck through.
+  function renderPreview(text) {
+    const pre = $('preview');
+    if (!text) { pre.replaceChildren(el('span', { class: 'empty' }, 'Your macro will appear here.')); return; }
+    const out = [];
+    let used = 0;
+    const push = (str, cls) => {
+      if (!str) return;
+      const size = byteLen(str);
+      if (used >= LIMIT) { out.push(el('span', { class: 'tk-over' }, str)); used += size; return; }
+      if (used + size <= LIMIT) { out.push(el('span', { class: cls }, str)); used += size; return; }
+      // split inside this token at the limit
+      let cut = 0, b = used;
+      for (const ch of str) { const s = byteLen(ch); if (b + s > LIMIT) break; b += s; cut += ch.length; }
+      out.push(el('span', { class: cls }, str.slice(0, cut)), el('span', { class: 'tk-over' }, str.slice(cut)));
+      used += size;
+    };
+    // command, [conditions], ";" and names each get their own color; # lines are orange
+    const re = /(^[\/#]\S+)|(\[[^\]]*\])|(;)|([^\[;]+)/g;
+    text.split('\n').forEach((line, i, all) => {
+      for (const m of line.matchAll(re)) {
+        push(m[0], m[1] ? (m[1][0] === '#' ? 'tk-dir' : 'tk-cmd') : m[2] ? 'tk-cond' : m[3] ? 'tk-semi' : 'tk-name');
+      }
+      if (i < all.length - 1) push('\n', '');
+    });
+    pre.replaceChildren(...out);
+  }
+
+  function renderNotes(text, rowInfo) {
+    const notes = [];
+    const size = byteLen(text);
+    if (size > LIMIT) notes.push(['err', `Over the limit by ${size - LIMIT} characters. The game will cut off everything struck through.`]);
+    if (state.tooltip === 'spell' && !state.tooltipSpell.trim()) notes.push(['warn', 'Pick the spell to show on the first line, or switch it to automatic.']);
+    const used = state.rows.filter(r => r.spell.trim());
+    if (state.tooltip === 'match' && used.length && used.every(r => r.cmd === used[0].cmd))
+      notes.push(['tip', 'With only one command line, plain #showtooltip already follows its conditions and is shorter. This option helps when you mix /cast and /use.']);
+    const dead = state.rows.filter(r => rowInfo.get(r.id)?.dead).length;
+    if (dead) notes.push(['warn', `${dead} spell${dead > 1 ? 's are' : ' is'} never reached. Move spells with no conditions to the bottom.`]);
+    if (state.rows.some(r => r.target === '@cursor'))
+      notes.push(['tip', 'Cursor targeting only works for ground spells like Blizzard or Flare.']);
+    if (!state.compact && size > LIMIT - 20) {
+      const saved = size - byteLen(buildCompactPreview());
+      if (saved > 0) notes.push(['tip', `Turning on compact spacing saves ${saved} characters.`]);
+    }
+    if (/[^\x00-\x7f]/.test(text)) notes.push(['tip', 'Accented letters count as 2 characters in game; the counter already includes that.']);
+    $('notes').replaceChildren(...notes.map(([cls, msg]) => el('li', { class: cls }, msg)));
+  }
+
+  function buildCompactPreview() {
+    const prev = state.compact;
+    state.compact = true;
+    const { text } = build();
+    state.compact = prev;
+    return text;
+  }
+
+  function renderMeter(text) {
+    const size = byteLen(text);
+    $('count').textContent = size;
+    $('meterFill').style.width = Math.min(100, size / LIMIT * 100) + '%';
+    $('meter').className = 'sbar' + (size > LIMIT ? ' over' : size > LIMIT * 0.9 ? ' warn' : '');
+    $('left').textContent = size > LIMIT ? `${size - LIMIT} over` : `${LIMIT - size} left`;
+    // phone bar mirrors the counter
+    $('mCount').textContent = size;
+    $('mFill').style.width = $('meterFill').style.width;
+    $('mMeter').className = $('meter').className;
+  }
+
+  function renderSpellList() {
+    const names = [...new Set(state.rows.map(r => r.spell.trim()).filter(Boolean))];
+    $('spellList').replaceChildren(...names.map(n => el('option', { value: n })));
+  }
+
+  // WoW class colors for the saved list headings
+  const CLASS_COLORS = { druid: '#ff7c0a', hunter: '#aad372', mage: '#3fc7eb', paladin: '#f48cba', priest: '#ffffff',
+    rogue: '#fff468', shaman: '#0070dd', warlock: '#8788ee', warrior: '#c69b6d' };
+  const savedClass = s => SPELL_DATA[s.state?.cls] ? s.state.cls : '';
+  // icon of the first spell in a saved macro that we know
+  function savedIcon(s) {
+    const cls = savedClass(s);
+    for (const r of s.state?.rows || []) {
+      const key = (r.spell || '').trim().toLowerCase();
+      if (!key || r.cmd === '/use') continue;
+      const hit = ALL_SPELLS.find(x => x.name.toLowerCase() === key && (!cls || x.cls === cls)) || ALL_SPELLS.find(x => x.name.toLowerCase() === key);
+      if (hit?.icon) return hit.icon;
+    }
+    return '';
+  }
+  let confirmDelete = null; // name of the macro whose delete button is waiting for a second click
+
+  const loadSaved = () => {
+    const list = store.get(SAVED_KEY, []);
+    return Array.isArray(list) ? list.filter(s => s && typeof s.name === 'string' && s.name.trim()) : [];
+  };
+
+  function renderSaved() {
+    const saved = loadSaved();
+    if (!saved.length) { $('saved').replaceChildren(el('li', { class: 'saved-empty' }, 'Nothing saved yet. Give your macro a name and press Save. Saved macros stay in this browser.')); return; }
+    const current = state.name.trim().toLowerCase();
+    const items = [];
+    for (const c of [...CLASSES.slice(1), CLASSES[0]]) { // classes first, "No class" last
+      const group = saved.map((s, i) => ({ s, i })).filter(({ s }) => savedClass(s) === c.v);
+      if (!group.length) continue;
+      items.push(el('li', { class: 'group', style: c.v ? `--cls:${CLASS_COLORS[c.v]}` : '' }, c.v ? c.label : 'No class'));
+      group.forEach(({ s, i }, k) => {
+        // swap with the neighbour in the same class group
+        const move = d => () => {
+          const list = loadSaved();
+          const j = group[k + d].i;
+          [list[i], list[j]] = [list[j], list[i]];
+          store.set(SAVED_KEY, list);
+          renderSaved();
+        };
+        const spellIcon = savedIcon(s);
+        const waiting = confirmDelete === s.name;
+        items.push(el('li', { class: 'item' + (s.name.toLowerCase() === current ? ' current' : '') },
+          el('button', { type: 'button', class: 'load', title: 'Load ' + s.name, on: { click: () => {
+            state = normalize(s.state);
+            renderAll();
+            toast('Loaded ' + s.name);
+          } } },
+            spellIcon ? el('img', { src: ICON_URL(spellIcon), alt: '', referrerpolicy: 'no-referrer' }) : el('span', { class: 'noicon' }),
+            el('span', { class: 'name' }, s.name),
+            Number.isFinite(s.size) ? el('span', { class: 'meta' }, s.size + '/255') : null),
+          el('button', { type: 'button', class: 'btn icon', title: 'Move up', disabled: k === 0, on: { click: move(-1) } }, icon('up')),
+          el('button', { type: 'button', class: 'btn icon', title: 'Move down', disabled: k === group.length - 1, on: { click: move(1) } }, icon('down')),
+          el('button', { type: 'button', class: 'btn icon danger' + (waiting ? ' confirm' : ''), title: 'Delete', on: { click: () => {
+            if (!waiting) {
+              confirmDelete = s.name;
+              renderSaved();
+              setTimeout(() => { if (confirmDelete === s.name) { confirmDelete = null; renderSaved(); } }, 3000);
+              return;
+            }
+            confirmDelete = null;
+            store.set(SAVED_KEY, loadSaved().filter(x => x.name !== s.name));
+            renderSaved();
+            toast('Deleted ' + s.name);
+          } } }, waiting ? 'Sure?' : icon('x')),
+        ));
+      });
+    }
+    $('saved').replaceChildren(...items);
+  }
+
+  // Everything that depends on the macro text, but not the spell rows themselves.
+  function refreshOutputs() {
+    const built = build();
+    renderPreview(built.text);
+    renderMeter(built.text);
+    renderNotes(built.text, built.rowInfo);
+    renderSpellList();
+    store.set(DRAFT_KEY, state);
+    return built;
+  }
+
+  function refresh() {
+    const { rowInfo } = refreshOutputs();
+    renderRowsKeepFocus(rowInfo);
+    renderSuggest();
+  }
+
+  /* ---------- spell search ---------- */
+
+  const sug = { rowId: null, items: [], idx: 0 };
+
+  function openSuggest(r, text) {
+    const q = text.trim().toLowerCase();
+    if (r.cmd !== '/cast' || !q) return closeSuggest();
+    // starts with the text first, then a word starting with it, then anywhere
+    const score = x => {
+      const n = x.name.toLowerCase();
+      return n.startsWith(q) ? 0 : n.split(/[\s:'-]+/).some(w => w.startsWith(q)) ? 1 : n.includes(q) ? 2 : -1;
+    };
+    const seen = new Set();
+    sug.items = spellPool().map(x => [score(x), x]).filter(([sc]) => sc >= 0)
+      .sort((a, b) => a[0] - b[0] || a[1].name.localeCompare(b[1].name))
+      .map(([, x]) => x).filter(x => !seen.has(x.name) && seen.add(x.name)).slice(0, 8);
+    // nothing to suggest once the box holds exactly the one match
+    if (sug.items.length === 1 && sug.items[0].name.toLowerCase() === q) sug.items = [];
+    sug.rowId = r.id;
+    sug.idx = 0;
+    renderSuggest();
+  }
+
+  function closeSuggest() {
+    sug.rowId = null;
+    renderSuggest();
+  }
+
+  function pickSuggest(x) {
+    const r = state.rows.find(row => row.id === sug.rowId);
+    if (!r) return closeSuggest();
+    if (r.spell.trim().toLowerCase() !== x.name.toLowerCase()) r.rank = '';
+    r.spell = x.name;
+    refresh();
+    const input = document.querySelector(`input[data-row-id="${r.id}"]`);
+    if (input) { input.focus(); input.setSelectionRange(input.value.length, input.value.length); }
+    closeSuggest(); // focusing the box above reopens the list
+  }
+
+  function suggestKey(e) {
+    if (sug.rowId === null || !sug.items.length) return;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      sug.idx = (sug.idx + (e.key === 'ArrowDown' ? 1 : -1) + sug.items.length) % sug.items.length;
+      renderSuggest();
+    } else if (e.key === 'Enter' || e.key === 'Tab') {
+      if (e.key === 'Enter') e.preventDefault();
+      pickSuggest(sug.items[sug.idx]);
+    } else if (e.key === 'Escape') closeSuggest();
+  }
+
+  // One floating list, placed under whichever spell box is being typed in.
+  function renderSuggest() {
+    const panel = $('suggest');
+    const input = sug.rowId === null ? null : document.querySelector(`input[data-row-id="${sug.rowId}"]`);
+    if (!input || !sug.items.length) { panel.hidden = true; return; }
+    const box = input.getBoundingClientRect();
+    const wide = input.parentElement.getBoundingClientRect(); // the spell box plus its rank picker
+    panel.style.left = box.left + window.scrollX + 'px';
+    panel.style.top = box.bottom + window.scrollY + 4 + 'px';
+    panel.style.width = Math.max(wide.width, 240) + 'px';
+    const showClass = !SPELL_DATA[state.cls];
+    panel.replaceChildren(...sug.items.map((x, k) => el('div', {
+      class: 'sitem' + (k === sug.idx ? ' on' : ''),
+      on: { mousedown: e => { e.preventDefault(); pickSuggest(x); } },
+    },
+      x.icon ? el('img', { src: ICON_URL(x.icon), alt: '', referrerpolicy: 'no-referrer' }) : el('span'),
+      el('span', { class: 'sname' }, x.name),
+      el('small', {}, [showClass ? classLabel(x.cls) : '', x.levels.length > 1 ? x.levels.length + ' ranks' : ''].filter(Boolean).join(' \u00b7 ')),
+    )));
+    panel.hidden = false;
+  }
+  window.addEventListener('resize', renderSuggest);
+
+  // Re-render rows but put focus back on the same control (and caret, in a spell box).
+  function renderRowsKeepFocus(rowInfo) {
+    const key = document.activeElement?.dataset?.focus;
+    const pos = document.activeElement?.selectionStart;
+    renderRows(rowInfo);
+    const again = key && $('rows').querySelector(`[data-focus="${key}"]`);
+    if (!again) return;
+    again.focus({ preventScroll: true });
+    if (typeof pos === 'number' && again.setSelectionRange) again.setSelectionRange(pos, pos);
+  }
+
+  function renderAll() {
+    $('name').value = state.name;
+    $('cls').value = state.cls;
+    $('tooltip').value = state.tooltip;
+    $('tooltipSpell').value = state.tooltipSpell;
+    $('tooltipSpellWrap').hidden = state.tooltip !== 'spell';
+    $('compact').checked = state.compact;
+    renderExtras();
+    refresh();
+    renderSaved();
+  }
+
+  /* ---------- actions ---------- */
+
+  let toastTimer;
+  function toast(msg) {
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 1600);
+  }
+
+  async function copyText(text) {
+    try { await navigator.clipboard.writeText(text); return true; }
+    catch {
+      const ta = el('textarea', { style: 'position:fixed;opacity:0' });
+      ta.value = text;
+      document.body.append(ta);
+      ta.select();
+      let ok = false;
+      try { ok = document.execCommand('copy'); } catch { /* ignore */ }
+      ta.remove();
+      return ok;
+    }
+  }
+
+  $('name').addEventListener('input', e => { state.name = e.target.value; store.set(DRAFT_KEY, state); renderSaved(); });
+  document.addEventListener('click', e => {
+    if (openStance !== null && !e.target.closest('.msel')) {
+      openStance = null;
+      document.querySelectorAll('.msel[open]').forEach(d => { d.open = false; });
+    }
+  });
+  $('cls').replaceChildren(...CLASSES.map(c => el('option', { value: c.v }, c.label)));
+  $('cls').addEventListener('change', e => {
+    state.cls = e.target.value;
+    for (const r of state.rows) r.stances = []; // numbers mean different things per class
+    refresh();
+  });
+  $('tooltip').addEventListener('change', e => {
+    state.tooltip = e.target.value;
+    $('tooltipSpellWrap').hidden = state.tooltip !== 'spell';
+    if (state.tooltip === 'spell' && !state.tooltipSpell) {
+      state.tooltipSpell = state.rows.map(r => r.spell.trim()).find(Boolean) || '';
+      $('tooltipSpell').value = state.tooltipSpell;
+    }
+    refresh();
+  });
+  $('tooltipSpell').addEventListener('input', e => { state.tooltipSpell = e.target.value; refresh(); });
+  $('compact').addEventListener('change', e => { state.compact = e.target.checked; refresh(); });
+  $('addRow').addEventListener('click', () => {
+    state.rows.push(newRow());
+    refresh();
+    document.querySelector(`input[data-row-id="${state.rows.at(-1).id}"]`)?.focus();
+  });
+
+  async function copyMacro() {
+    const { text } = build();
+    if (!text) return toast('Nothing to copy yet');
+    const ok = await copyText(text);
+    toast(!ok ? 'Copy failed, select the preview and copy it' : byteLen(text) > LIMIT ? 'Copied, but it is over 255 characters' : 'Macro copied');
+  }
+  $('copy').addEventListener('click', copyMacro);
+  $('mCopy').addEventListener('click', copyMacro);
+  $('mPreview').addEventListener('click', () => $('previewCard').scrollIntoView({ behavior: 'smooth', block: 'start' }));
+
+  $('save').addEventListener('click', () => {
+    const name = state.name.trim();
+    if (!name) { $('name').focus(); return toast('Give the macro a name first'); }
+    const list = loadSaved();
+    const entry = { name, size: byteLen(build().text), state: structuredClone(state) };
+    const i = list.findIndex(s => s.name.toLowerCase() === name.toLowerCase());
+    if (i >= 0) list[i] = entry; else list.unshift(entry);
+    store.set(SAVED_KEY, list);
+    renderSaved();
+    toast(i >= 0 ? 'Updated ' + name : 'Saved ' + name);
+  });
+
+  $('reset').addEventListener('click', () => {
+    state = freshState();
+    renderAll();
+    toast('Started a new macro');
+  });
+
+  renderAll();
+})();
+</script>
+</body>
+</html>
