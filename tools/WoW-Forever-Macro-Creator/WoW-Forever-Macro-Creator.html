@@ -351,7 +351,24 @@
     color: var(--cls, var(--mute)); text-shadow: 0 1px 0 #000; padding: 10px 6px 4px; border-bottom: 1px solid var(--steel-dk); margin-bottom: 2px;
   }
   .saved .group:first-child { padding-top: 0; }
+  .saved .group button {
+    all: unset; box-sizing: border-box; width: 100%; display: flex; align-items: center; gap: 7px; cursor: pointer;
+  }
+  .saved .group button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 2px; }
+  .saved .group .chev {
+    flex: none; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 4px;
+    background: #0b0e22; border: 1px solid var(--steel-dk); box-shadow: 0 1px 0 #000;
+    color: var(--cls, var(--mute)); transition: border-color .15s, background .15s;
+  }
+  .saved .group button:hover .chev, .saved .group button[aria-expanded="true"] .chev { border-color: var(--cls, var(--steel)); }
+  .saved .group button:hover .chev { background: #141938; }
+  .saved .group .chev svg { display: block; transition: transform .2s ease; }
+  .saved .group button[aria-expanded="false"] .chev svg { transform: rotate(-90deg); }
+  @media (prefers-reduced-motion: reduce) { .saved .group .chev, .saved .group .chev svg { transition: none; } }
+  .saved .group .count { margin-left: auto; color: var(--mute); font-family: var(--f-ui); font-size: 12px; letter-spacing: 0; }
+  .saved .group button:hover .count { color: var(--gold); }
   .saved .item { display: grid; grid-template-columns: minmax(0,1fr) auto auto auto; gap: 4px; align-items: center; padding: 3px 4px; border-radius: 4px; }
+  .saved .item[hidden] { display: none; }
   .saved .item:hover { background: rgba(79, 127, 255, .1); }
   .saved .item.current { background: rgba(255, 209, 0, .07); box-shadow: inset 3px 0 0 var(--gold-dk); }
   .saved .load { display: flex; align-items: center; gap: 9px; min-width: 0; background: none; border: 0; padding: 2px; text-align: left; }
@@ -620,6 +637,7 @@
     down: '<path d="M8 3v10M4 9l4 4 4-4"/>',
     copy: '<rect x="5.5" y="5.5" width="7.5" height="7.5" rx="1"/><path d="M3 10.5V3h7.5"/>',
     x:    '<path d="M4 4l8 8M12 4l-8 8"/>',
+    chevron: '<path d="M4 6l4 4 4-4"/>',
   };
   const icon = name => {
     const t = document.createElement('template');
@@ -1216,6 +1234,7 @@
     return '';
   }
   let confirmDelete = null; // name of the macro whose delete button is waiting for a second click
+  const openGroups = new Set(); // class groups the user has expanded; all start collapsed
 
   const loadSaved = () => {
     const list = store.get(SAVED_KEY, []);
@@ -1230,7 +1249,15 @@
     for (const c of [...CLASSES.slice(1), CLASSES[0]]) { // classes first, "No class" last
       const group = saved.map((s, i) => ({ s, i })).filter(({ s }) => savedClass(s) === c.v);
       if (!group.length) continue;
-      items.push(el('li', { class: 'group', style: c.v ? `--cls:${CLASS_COLORS[c.v]}` : '' }, c.v ? c.label : 'No class'));
+      const open = openGroups.has(c.v);
+      const rows = []; // this class's macro rows, shown or hidden in place so the chevron can animate
+      items.push(el('li', { class: 'group', style: c.v ? `--cls:${CLASS_COLORS[c.v]}` : '' },
+        el('button', { type: 'button', 'aria-expanded': String(open), on: { click: e => {
+          const nowOpen = !openGroups.delete(c.v);
+          if (nowOpen) openGroups.add(c.v);
+          e.currentTarget.setAttribute('aria-expanded', String(nowOpen));
+          rows.forEach(r => { r.hidden = !nowOpen; });
+        } } }, c.v ? c.label : 'No class', el('span', { class: 'count' }, String(group.length)), el('span', { class: 'chev' }, icon('chevron')))));
       group.forEach(({ s, i }, k) => {
         // swap with the neighbour in the same class group
         const move = d => () => {
@@ -1242,7 +1269,7 @@
         };
         const spellIcon = savedIcon(s);
         const waiting = confirmDelete === s.name;
-        items.push(el('li', { class: 'item' + (s.name.toLowerCase() === current ? ' current' : '') },
+        rows.push(el('li', { class: 'item' + (s.name.toLowerCase() === current ? ' current' : ''), hidden: !open },
           el('button', { type: 'button', class: 'load', title: 'Load ' + s.name, on: { click: () => {
             state = normalize(s.state);
             renderAll();
@@ -1267,6 +1294,7 @@
           } } }, waiting ? 'Sure?' : icon('x')),
         ));
       });
+      items.push(...rows);
     }
     $('saved').replaceChildren(...items);
   }
@@ -1482,6 +1510,7 @@
     const i = list.findIndex(s => s.name.toLowerCase() === name.toLowerCase());
     if (i >= 0) list[i] = entry; else list.unshift(entry);
     store.set(SAVED_KEY, list);
+    openGroups.add(savedClass(entry)); // show the macro you just saved
     renderSaved();
     toast(i >= 0 ? 'Updated ' + name : 'Saved ' + name);
   });
