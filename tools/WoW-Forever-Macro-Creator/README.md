@@ -3,8 +3,8 @@ Build WoW Forever macros without memorizing the syntax.
 
 - Combine several spells or items into one button, checked top to bottom.
 - Search your class spells as you type, with their icons, and pick a lower rank when you want to downrank. Hover a spell (or tap its icon on a phone) to see its tooltip: cost, range, cast time, cooldown and what it does. The spell list comes from the WoW Forever game files. Your Hearthstone is in the search for every character too. You can still type anything yourself, like items or trinket slots.
-- Toggle Shift, Ctrl, Alt or "no modifier key" per spell, pick a target (mouseover, yourself, focus, cursor and more) and add conditions about the target (friendly, enemy, alive, dead) or about you (in combat, stealthed, mounted, swimming, indoors, outdoors and more), or what you have equipped (bow, crossbow, gun, thrown weapon, wand or shield).
-- Shoot Bow, Shoot Crossbow, Shoot Gun, Throw and wand Shoot are in the spell search for the classes that use them.
+- Toggle Shift, Ctrl, Alt or "no modifier key" per spell, pick a target (mouseover, yourself, focus, cursor and more) and add conditions about the target, about you, or about what you have equipped.
+- Ranged attacks are in the spell search for the classes that use them.
 - Pick your race to add its WoW Forever racial abilities to the spell search, with the same tooltips. Races your class can't be in WoW Forever are greyed out, and priest spells only some races get are labelled.
 - Spell tooltips match WoW Forever's own, with numbers as a level 60 character sees them.
 - Build cast sequences: a purple box with its own list of spells in the order you want, cast one per press. Choose when it starts over (after a number of seconds, on a new target, when leaving combat or when holding Shift, Ctrl or Alt), and get a warning when a spell with a cooldown would hold the sequence up.
