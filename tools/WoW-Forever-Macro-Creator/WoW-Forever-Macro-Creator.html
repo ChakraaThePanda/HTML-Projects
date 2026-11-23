@@ -715,14 +715,27 @@
   ];
   SPELL_TIPS.item = Object.fromEntries(ITEMS.map(([name, , desc, cast, cd]) => [name, { rows: [[desc, '', cast, '', cd]] }]));
 
+  // Ranged attacks shared by several classes: [name, icon, description, classes that can use it].
+  // Hunters fire every ranged weapon with Auto Shot instead.
+  const PHYS = ['warrior', 'rogue'], CASTERS = ['mage', 'priest', 'warlock'];
+  const RANGED = [
+    ['Shoot Bow',      'ability_marksmanship', 'Shoot with a bow.', PHYS],
+    ['Shoot Crossbow', 'ability_marksmanship', 'Shoot with a crossbow.', PHYS],
+    ['Shoot Gun',      'ability_marksmanship', 'Shoot with a gun.', PHYS],
+    ['Throw',          'ability_throw',        'Throw a weapon at the target.', PHYS],
+    ['Shoot',          'ability_shootwand',    'Shoot with a wand.', CASTERS],
+  ];
+  SPELL_TIPS.ranged = Object.fromEntries(RANGED.map(([name, , desc]) => [name, { rows: [[desc, '', '', '', '']] }]));
+
   // Every spell as { name, icon, levels, cls }. Racials have the race in `cls` and `race: true`,
-  // items have `item: true`; `races` lists who gets a race-only class spell.
+  // items have `item: true`, shared ranged attacks list their classes in `ranged`; `races` lists who gets a race-only class spell.
   const ALL_SPELLS = [
     ...Object.entries(SPELL_DATA).flatMap(([cls, list]) =>
       list.map(([name, icon, levels]) => ({ name, icon, levels, cls, races: cls === 'priest' ? PRIEST_RACE_SPELLS[name] : undefined }))),
     ...Object.entries(RACIALS).flatMap(([race, list]) =>
       list.map(([name, icon]) => ({ name, icon, levels: [], cls: race, race: true }))),
     ...ITEMS.map(([name, icon]) => ({ name, icon, levels: [], cls: 'item', item: true })),
+    ...RANGED.map(([name, icon, , classes]) => ({ name, icon, levels: [], cls: 'ranged', ranged: classes })),
   ];
   const classLabel = v => CLASSES.find(c => c.v === v)?.label || '';
   const isClass = v => typeof v === 'string' && Object.hasOwn(SPELL_DATA, v);
@@ -733,7 +746,7 @@
   });
   // what the search offers: your class spells (all of them with no class picked), your race's racials and the shared items
   // (with only a class or only a race picked, the other side is limited to what fits it)
-  const spellPool = () => ALL_SPELLS.filter(x => x.item || (x.race
+  const spellPool = () => ALL_SPELLS.filter(x => x.item || (x.ranged ? (isClass(state.cls) ? x.ranged.includes(state.cls) : x.ranged.some(c => raceFits(state.race, c))) : x.race
     ? (state.race ? x.cls === state.race : raceFits(x.cls, state.cls))
     : (isClass(state.cls) ? x.cls === state.cls : raceFits(state.race, x.cls)) && (!state.race || !x.races || x.races.includes(state.race))));
   const findSpell = name => {
@@ -782,7 +795,20 @@
     { v: 'indoors',      label: 'Indoors',         say: 'you are indoors',         group: 'place', self: true },
     { v: 'outdoors',     label: 'Outdoors',        say: 'you are outdoors',        group: 'place', self: true },
     { v: 'nochanneling', label: 'Not channeling',  say: 'you are not channeling',  self: true },
+    // what you have equipped ("worn:" means the same thing); `gear` puts them in their own list
+    { v: 'equipped:Bows',      label: 'Bow equipped',      say: 'you have a bow equipped',      group: 'ranged', self: true, gear: true },
+    { v: 'equipped:Crossbows', label: 'Crossbow equipped', say: 'you have a crossbow equipped', group: 'ranged', self: true, gear: true },
+    { v: 'equipped:Guns',      label: 'Gun equipped',      say: 'you have a gun equipped',      group: 'ranged', self: true, gear: true },
+    { v: 'equipped:Thrown',    label: 'Thrown equipped',   say: 'you have a thrown weapon equipped', group: 'ranged', self: true, gear: true },
+    { v: 'equipped:Wands',     label: 'Wand equipped',     say: 'you have a wand equipped',     group: 'ranged', self: true, gear: true },
+    { v: 'equipped:Shields',   label: 'Shield equipped',   say: 'you have a shield equipped',   self: true, gear: true },
   ];
+
+  // a lowercased condition from a pasted macro -> its CONDS entry; "worn:bow", "equipped:bows" and the like count too
+  const condFromText = lc => {
+    const m = lc.match(/^(?:equipped|worn):\s*(bow|crossbow|gun|thrown|wand|shield)s?$/);
+    return m ? CONDS.find(c => c.v.toLowerCase().startsWith('equipped:' + m[1])) : CONDS.find(c => c.v === lc);
+  };
 
   const $ = id => document.getElementById(id);
   const el = (tag, props = {}, ...kids) => {
@@ -1023,7 +1049,7 @@
       ? [fill(data[0], data[1][k]), fill(data[2], data[3][k]), data[4], data[5], data[6]]
       : data.rows[k];
     if (data.byClass?.[state.cls]) desc = data.byClass[state.cls]; // a racial worded differently per class
-    return { name: x.name, rank: x.item ? 'Item' : x.race ? 'Racial' : x.levels.length > 1 ? `Rank ${k + 1}` : '', level: x.levels[k] || 0, desc, cost, cast, range, cd };
+    return { name: x.name, rank: x.item ? 'Item' : x.ranged ? 'Ranged' : x.race ? 'Racial' : x.levels.length > 1 ? `Rank ${k + 1}` : '', level: x.levels[k] || 0, desc, cost, cast, range, cd };
   }
 
   let tipFor = null; // the element the tooltip is showing for
@@ -1252,8 +1278,8 @@
         r.conds = r.conds.filter(x => x !== c.v);
         refresh();
       }, 'cond', '', c.v + ' (click to remove)'));
-      const condGroup = (label, self) => el('optgroup', { label },
-        ...CONDS.filter(c => !!c.self === self && !r.conds.includes(c.v))
+      const condGroup = (label, fits) => el('optgroup', { label },
+        ...CONDS.filter(c => fits(c) && !r.conds.includes(c.v))
           .map(c => el('option', { value: c.v }, c.label)));
       const condSel = focusKey(el('select', { class: 'add-cond', on: { change: e => {
         const c = CONDS.find(o => o.v === e.target.value);
@@ -1262,8 +1288,9 @@
         refresh();
       } } },
         el('option', { value: '' }, '+ Add condition'),
-        condGroup('Target is', false),
-        condGroup('You are', true)), r, 'add-cond');
+        condGroup('Target is', c => !c.self),
+        condGroup('You are', c => c.self && !c.gear),
+        condGroup('Equipped', c => c.gear)), r, 'add-cond');
       condSel.value = '';
       condChips.push(condSel);
 
@@ -1473,7 +1500,12 @@
         const { spell, rank } = seq ? { spell: '', rank: '' } : ranked(rest);
         const what = seq ? 'the cast sequence' : spell;
         // "[a][b] Spell" means a OR b, which is the same as "[a] Spell; [b] Spell": one row per group
-        for (const group of groups.length ? groups : ['']) {
+        // "[equipped:Guns/Bows]" means either one, so it becomes a group for each
+        const expanded = (groups.length ? groups : ['']).flatMap(g => {
+          const m = g.match(/(^|,)\s*((?:equipped|worn):\s*)([^,\]]*\/[^,\]]*)/i);
+          return m ? m[3].split('/').filter(Boolean).map(w => g.replace(m[0], m[1] + m[2] + w.trim())) : [g];
+        });
+        for (const group of expanded) {
           const row = { ...newRow(), cmd: '/' + cmd[1].toLowerCase(), spell, rank, ownLine: firstOnLine && st.rows.length > 0,
             seq: items.map(x => ({ ...newItem(), ...x })), reset: structuredClone(reset) };
           firstOnLine = false;
@@ -1481,6 +1513,7 @@
             const lc = c.toLowerCase().replace(/^(no)?modifier/, '$1mod').replace(/^target=/, '@');
             const mod = lc.match(/^mod:(shift|ctrl|alt)$/);
             const stance = lc.match(/^(?:stance|form):([0-9/]+)$/);
+            const cond = condFromText(lc);
             if (lc === '@target') continue;   // the current target is already the default
             if (lc.startsWith('@') && TARGETS.some(t => t.v === lc)) row.target = lc;
             else if (mod) { if (!row.mods.includes(mod[1])) row.mods.push(mod[1]); }
@@ -1489,7 +1522,8 @@
               row.stances = stance ? stance[1].split('/').filter(Boolean) : ['0'];
               usesStances = true;
             }
-            else if (CONDS.some(k => k.v === lc)) row.conds.push(lc);
+            else if (cond) // a later condition replaces one from the same group, as in the editor
+              row.conds = [...row.conds.filter(x => x !== cond.v && (!cond.group || CONDS.find(o => o.v === x)?.group !== cond.group)), cond.v];
             else skipped.push(`[${c}] on ${what} (left out)`);
           }
           if (row.nomod) row.mods = [];
@@ -1502,7 +1536,7 @@
     const names = new Set(used);
     const votes = {};
     for (const n of used) // every use counts, so a spell in three rows weighs three times
-      for (const x of ALL_SPELLS) if (!x.race && !x.item && x.name.toLowerCase() === n) votes[x.cls] = (votes[x.cls] || 0) + 1;
+      for (const x of ALL_SPELLS) if (!x.race && !x.item && !x.ranged && x.name.toLowerCase() === n) votes[x.cls] = (votes[x.cls] || 0) + 1;
     const best = Object.entries(votes).sort((a, b) => b[1] - a[1]);
     if (best.length && (best.length === 1 || best[0][1] > best[1][1])) st.cls = best[0][0];
     // the race with the most racials (or race-only priest spells) used that can also be this class;
@@ -1765,7 +1799,7 @@
       x.icon ? el('img', { src: ICON_URL(x.icon), alt: '', referrerpolicy: 'no-referrer' }) : el('span'),
       el('span', { class: 'sname' }, x.name),
       el('small', {}, [
-        x.item ? 'Item' : x.race ? racialTag(x) : showClass ? classLabel(x.cls) : '',
+        x.item ? 'Item' : x.ranged ? (showClass ? x.ranged.map(classLabel).join(' / ') : 'Ranged') : x.race ? racialTag(x) : showClass ? classLabel(x.cls) : '',
         x.races && !state.race ? x.races.map(raceLabel).join(' / ') + ' only' : '',
         x.levels.length > 1 ? x.levels.length + ' ranks' : '',
       ].filter(Boolean).join(' \u00b7 ')),
