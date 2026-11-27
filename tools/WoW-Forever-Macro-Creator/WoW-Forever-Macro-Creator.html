@@ -601,7 +601,8 @@
   const EXTRAS = [
     { id: 'stopcasting', line: '/stopcasting', label: 'Stop casting first', pos: 'pre' },
     { id: 'dismount',    line: '/dismount',    label: 'Dismount first', pos: 'pre' },
-    { id: 'startattack', line: '/startattack', label: 'Start auto attack', pos: 'pre' },
+    { id: 'startattack', line: '/startattack', label: 'Start auto attack', pos: 'pre', not: 'stopattack' },
+    { id: 'stopattack',  line: '/stopattack',  label: 'Stop auto attack', pos: 'pre', not: 'startattack' },
     { id: 'petattack',   line: '/petattack',   label: 'Send pet to attack', pos: 'pre' },
     { id: 'clearerrors', line: '/run UIErrorsFrame:Clear()', label: 'Hide red error text', pos: 'post' },
   ];
@@ -1020,7 +1021,8 @@
 
   function renderExtras() {
     $('extras').replaceChildren(...EXTRAS.map(e => chip(e.label, state.extras.includes(e.id), () => {
-      state.extras = state.extras.includes(e.id) ? state.extras.filter(x => x !== e.id) : [...state.extras, e.id];
+      state.extras = state.extras.includes(e.id) ? state.extras.filter(x => x !== e.id)
+        : [...state.extras.filter(x => x !== e.not), e.id];
       renderExtras();
       refresh();
       $('extras').querySelector(`[data-focus="extra:${e.id}"]`)?.focus();
