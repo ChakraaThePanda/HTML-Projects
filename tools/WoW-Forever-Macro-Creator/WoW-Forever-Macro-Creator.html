@@ -926,6 +926,16 @@
     return parts.length ? 'reset=' + parts.join('/') + ' ' : '';
   }
 
+  // The same spell right after itself stacks its conditions: "[a][b] Spell" means a or b,
+  // and is shorter than "[a] Spell; [b] Spell".
+  function addClause(line, conds, body) {
+    const last = line.clauses.at(-1);
+    if (conds.length && last && last.body === body && last.groups.length) last.groups.push(conds.join(','));
+    else line.clauses.push({ groups: conds.length ? [conds.join(',')] : [], body });
+  }
+  const hasClause = (line, conds, body) => line.clauses.some(c => c.body === body &&
+    (conds.length ? c.groups.includes(conds.join(',')) : !c.groups.length));
+
   // Returns lines plus per-row info (which line it's on, whether it can ever fire).
   function build() {
     const sp = state.compact ? '' : ' ';
@@ -957,18 +967,18 @@
       const conds = rowConditions(r);
       rowInfo.set(r.id, { dead: caughtAll, fallback: conds.length === 0, lineStart, first: !current.clauses.length });
       const body = isSeq(r) ? resetText(r) + seqItems(r).map(spellText).join(',' + sp) : spellText(r);
-      const clause = (conds.length ? '[' + conds.join(',') + ']' + sp : '') + body;
-      current.clauses.push(clause);
+      addClause(current, conds, body);
       // on the first line a sequence stands in as its first spell (#showtooltip can't take a sequence)
-      const tipClause = isSeq(r) ? (conds.length ? '[' + conds.join(',') + ']' + sp : '') + spellText(seqItems(r)[0]) : clause;
-      if (tooltip && !caughtAll && !tooltipDone && !tooltip.clauses.includes(tipClause)) tooltip.clauses.push(tipClause);
+      const tipBody = isSeq(r) ? spellText(seqItems(r)[0]) : body;
+      if (tooltip && !caughtAll && !tooltipDone && !hasClause(tooltip, conds, tipBody)) addClause(tooltip, conds, tipBody);
       if (!conds.length) { caughtAll = true; tooltipDone = true; }
     }
 
     for (const e of EXTRAS) if (e.pos === 'post' && state.extras.includes(e.id)) lines.push(e.line);
 
     const text = lines
-      .map(l => typeof l === 'string' ? l : (l.cmd + ' ' + l.clauses.join(';' + sp)).trim())
+      .map(l => typeof l === 'string' ? l : (l.cmd + ' ' + l.clauses
+        .map(c => c.groups.map(g => '[' + g + ']').join('') + (c.groups.length ? sp : '') + c.body).join(';' + sp)).trim())
       .join('\n');
     return { text, rowInfo };
   }
